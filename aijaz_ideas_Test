@@ -2,76 +2,49 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Test - Daily Points</title>
+    <title>Daily Points Tracker</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
-        .card { background: white; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 12px; shadow: 0 2px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; }
-        td { padding: 12px; border-bottom: 1px solid #dee2e6; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; float: right; font-weight: bold; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { background: white; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; background: #eee; padding: 10px; border: 1px solid #ccc; }
+        td { padding: 5px; border: 1px solid #ccc; }
+        input, select { width: 100%; border: none; padding: 8px; box-sizing: border-box; outline: none; }
+        input:focus { background: #fffde7; }
+        .btn { background: #1a73e8; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; float: right; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <button class="btn" onclick="addRow()">+ Add New Point</button>
-    <h2 style="color: #333;">My Daily Points</h2>
+<div class="container">
+    <button class="btn" onclick="addRow()">+ Add Row</button>
+    <h2 id="status">My Daily Points</h2>
     
-    <table>
+    <table id="pointTable">
         <thead>
             <tr>
-                <th>Point Description</th>
+                <th>Description</th>
                 <th style="width: 150px;">Date</th>
-                <th style="width: 120px;">Status</th>
+                <th style="width: 100px;">Status</th>
             </tr>
         </thead>
-        <tbody id="masterTable"></tbody>
+        <tbody>
+            <tr><td><input type="text" placeholder="Point 1..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 2..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 3..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 4..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 5..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+        </tbody>
     </table>
 </div>
 
 <script>
-    // Initialize with 5 blank rows
-    let myData = JSON.parse(localStorage.getItem('local_test_points')) || [
-        {t: "", d: "2026-03-29", s: "Pending"},
-        {t: "", d: "2026-03-29", s: "Pending"},
-        {t: "", d: "2026-03-29", s: "Pending"},
-        {t: "", d: "2026-03-29", s: "Pending"},
-        {t: "", d: "2026-03-29", s: "Pending"}
-    ];
-
-    function render() {
-        const body = document.getElementById('masterTable');
-        body.innerHTML = "";
-        myData.forEach((item, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="text" value="${item.t}" placeholder="Type here..." oninput="update(${index}, 't', this.value)"></td>
-                <td><input type="date" value="${item.d}" onchange="update(${index}, 'd', this.value)"></td>
-                <td>
-                    <select onchange="update(${index}, 's', this.value)">
-                        <option ${item.s=='Pending'?'selected':''}>Pending</option>
-                        <option ${item.s=='Done'?'selected':''}>Done</option>
-                    </select>
-                </td>
-            `;
-            body.appendChild(row);
-        });
-        localStorage.setItem('local_test_points', JSON.stringify(myData));
-    }
-
-    function update(i, key, val) {
-        myData[i][key] = val;
-        localStorage.setItem('local_test_points', JSON.stringify(myData));
-    }
-
     function addRow() {
-        myData.push({t: "", d: new Date().toISOString().split('T')[0], s: "Pending"});
-        render();
+        var table = document.getElementById("pointTable").getElementsByTagName('tbody')[0];
+        var newRow = table.insertRow();
+        newRow.innerHTML = '<td><input type="text"></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td>';
     }
-
-    render();
 </script>
+
 </body>
 </html>
