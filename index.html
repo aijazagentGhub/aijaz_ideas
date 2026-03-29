@@ -1,50 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Points Tracker</title>
+    <title>Aijaz | Strategic Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { background: white; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; background: #eee; padding: 10px; border: 1px solid #ccc; }
-        td { padding: 5px; border: 1px solid #ccc; }
-        input, select { width: 100%; border: none; padding: 8px; box-sizing: border-box; outline: none; }
-        input:focus { background: #fffde7; }
-        .btn { background: #1a73e8; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; float: right; }
+        body {
+            background: #0f172a; /* Deep professional navy */
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        /* Style for the date and select to look modern */
+        input[type="date"], select {
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        input[type="date"]:hover, select:hover {
+            border-color: #6366f1;
+            background: #f8fafc;
+        }
+        .status-badge-pending { background: #fef3c7; color: #92400e; }
+        .status-badge-done { background: #dcfce7; color: #166534; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-12">
 
-<div class="container">
-    <button class="btn" onclick="addRow()">+ Add Row</button>
-    <h2 id="status">My Daily Points</h2>
-    
-    <table id="pointTable">
-        <thead>
-            <tr>
-                <th>Description</th>
-                <th style="width: 150px;">Date</th>
-                <th style="width: 100px;">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td><input type="text" placeholder="Point test..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-            <tr><td><input type="text" placeholder="Point 2..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-            <tr><td><input type="text" placeholder="Point 3..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-            <tr><td><input type="text" placeholder="Point 4..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-            <tr><td><input type="text" placeholder="Point 5..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-        </tbody>
-    </table>
-</div>
+    <div class="max-w-5xl mx-auto glass-card overflow-hidden">
+        <div class="p-8 border-b border-gray-100 bg-white flex flex-col md:flex-row md:items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-black text-slate-800 tracking-tight">Execution Board</h1>
+                <p class="text-slate-500 font-medium mt-1" id="currentDisplayDate"></p>
+            </div>
+            <button onclick="addRow()" class="mt-4 md:mt-0 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg hover:shadow-indigo-200 active:scale-95">
+                + Add Entry
+            </button>
+        </div>
 
-<script>
-    function addRow() {
-        var table = document.getElementById("pointTable").getElementsByTagName('tbody')[0];
-        var newRow = table.insertRow();
-        newRow.innerHTML = '<td><input type="text"></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td>';
-    }
-</script>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-8 py-5 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Task Description</th>
+                        <th class="px-8 py-5 text-left text-xs font-bold text-slate-400 uppercase tracking-widest w-48">Date</th>
+                        <th class="px-8 py-5 text-center text-xs font-bold text-slate-400 uppercase tracking-widest w-40">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y divide-slate-100">
+                    </tbody>
+            </table>
+        </div>
 
-</body>
-</html>
+        <div class="p-6 bg-slate-50 flex justify-between items-center border-t border-slate-100">
+            <div class="flex gap-6">
+                <div class="text-sm"><span class="text-slate-400">Total:</span> <span id="totalCount" class="font-bold text-slate-700">0</span></div>
+                <div class="text-sm"><span class="text
