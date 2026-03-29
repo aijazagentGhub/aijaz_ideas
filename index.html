@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz | Cloud Sync</title>
+    <title>Aijaz | Cloud Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
-<body class="bg-slate-900 p-4 md:p-10 font-sans text-slate-800">
+<body class="bg-slate-900 p-4 md:p-10 font-sans">
 
     <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div class="p-6 border-b flex justify-between items-center bg-white">
-            <h1 class="text-2xl font-black">Execution Board</h1>
+        <div class="p-6 border-b flex justify-between items-center">
+            <h1 class="text-2xl font-black text-slate-800">Aijaz Execution Board</h1>
             <button onclick="addEntry()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-                + Add Entry
+                + New Entry
             </button>
         </div>
 
@@ -22,35 +22,31 @@
             <table class="w-full">
                 <thead class="bg-slate-50 text-xs font-bold text-slate-400 uppercase tracking-widest">
                     <tr>
-                        <th class="px-8 py-4 text-left">Task</th>
+                        <th class="px-8 py-4 text-left">Task Description</th>
                         <th class="px-8 py-4 w-40 text-center">Status</th>
                         <th class="px-8 py-4 w-16"></th>
                     </tr>
                 </thead>
-                <tbody id="tableBody" class="divide-y divide-slate-100">
-                    </tbody>
+                <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // PASTE YOUR KEYS FROM FIREBASE SETTINGS HERE
+        // 1. MANUALLY FILL THESE THREE VALUES FROM FIREBASE SETTINGS
         const firebaseConfig = {
-            apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
-            authDomain: "aijazideas.firebaseapp.com",
-            databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
+            apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0", 
             projectId: "aijazideas",
-            storageBucket: "aijazideas.appspot.com",
-            messagingSenderId: "PASTE_SENDER_ID",
-            appId: "PASTE_APP_ID"
+            appId: "1:822948950064:web:031df081b41175ef3a7df5",
+            databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
-        // Initialize Firebase
+        // 2. Initialize
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const entriesRef = db.ref('entries');
 
-        // Listen for data
+        // 3. Listen for changes
         entriesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             const body = document.getElementById('tableBody');
@@ -63,7 +59,7 @@
                     tr.innerHTML = `
                         <td class="px-8 py-5">
                             <input type="text" value="${item.task}" onchange="updateRow('${key}', 'task', this.value)" 
-                                   class="w-full bg-transparent font-bold outline-none">
+                                   class="w-full bg-transparent font-bold text-slate-700 outline-none">
                         </td>
                         <td class="px-8 py-5 text-center">
                             <select onchange="updateRow('${key}', 'status', this.value)" 
@@ -83,7 +79,7 @@
 
         function addEntry() {
             entriesRef.push({
-                task: "New Task",
+                task: "New Strategic Point",
                 status: "Pending",
                 timestamp: Date.now()
             });
@@ -94,7 +90,7 @@
         }
 
         function deleteRow(key) {
-            if(confirm("Delete entry?")) db.ref('entries/' + key).remove();
+            if(confirm("Delete?")) db.ref('entries/' + key).remove();
         }
     </script>
 </body>
