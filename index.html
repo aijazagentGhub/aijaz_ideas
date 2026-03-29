@@ -3,55 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz | Cloud Tracker</title>
+    <title>Aijaz | Strategy Board</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        /* Blue Gradient Background from your image */
+        /* Sky Blue Background */
         body {
-            background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
             min-height: 100vh;
         }
-        .task-row:hover { background-color: #f0f7ff; transition: 0.2s; }
+        .task-row:hover { background-color: #f8fafc; transition: 0.2s; }
         .default-placeholder { opacity: 0.3; font-weight: normal !important; }
         
-        /* Blue themed date picker icon */
+        /* Vertical column separators */
+        .col-sep { border-right: 1px solid #e2e8f0; }
+        
+        /* Themed date picker icon */
         input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(39%) sepia(68%) saturate(1214%) hue-rotate(185deg) brightness(95%) contrast(92%);
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(170deg) brightness(94%) contrast(92%);
             cursor: pointer;
         }
     </style>
 </head>
 <body class="p-4 md:p-10 font-sans text-slate-800">
 
-    <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div class="p-8 border-b border-blue-50 flex flex-wrap gap-4 justify-between items-center bg-white">
+    <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-sky-200">
+        <div class="p-8 border-b border-sky-100 flex flex-wrap gap-4 justify-between items-end bg-white">
             <div>
-                <h1 class="text-3xl font-black text-blue-600 uppercase tracking-tight">Aijaz Execution Board</h1>
-                <p class="text-blue-400 text-sm font-bold">8 Essential Strategic Steps</p>
+                <h1 class="text-3xl font-black text-sky-600 uppercase tracking-tight">Aijaz Execution Board</h1>
+                <p id="entryCounter" class="text-sky-400 text-sm font-bold mt-1">Total Entries: 0</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="exportToCSV()" class="border-2 border-blue-500 text-blue-600 px-6 py-2 rounded-full font-bold hover:bg-blue-500 hover:text-white transition-all active:scale-95">
-                    Export All Ideas
+                <button onclick="exportToCSV()" class="border-2 border-sky-400 text-sky-600 px-6 py-2 rounded-full font-bold hover:bg-sky-400 hover:text-white transition-all active:scale-95">
+                    Export Ideas
                 </button>
-                <button onclick="addEntry()" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-blue-700 hover:shadow-blue-200 transition-all active:scale-95">
+                <button onclick="addEntry()" class="bg-sky-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-sky-600 hover:shadow-sky-200 transition-all active:scale-95">
                     + New Entry
                 </button>
             </div>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-blue-50 text-xs font-bold text-blue-400 uppercase tracking-widest">
+            <table class="w-full border-collapse">
+                <thead class="bg-sky-50 text-[11px] font-bold text-sky-500 uppercase tracking-widest">
                     <tr>
-                        <th class="px-8 py-5 text-left w-56">Execution Date</th>
-                        <th class="px-8 py-5 text-left">Task Description</th>
-                        <th class="px-8 py-5 w-44 text-center">Status</th>
-                        <th class="px-8 py-5 w-16"></th>
+                        <th class="px-8 py-4 text-left w-52 col-sep">Execution Date</th>
+                        <th class="px-8 py-4 text-left col-sep">Task Description</th>
+                        <th class="px-8 py-4 w-44 text-center col-sep">Status</th>
+                        <th class="px-8 py-4 w-16 text-center">Action</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody" class="divide-y divide-blue-50"></tbody>
+                <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
             </table>
         </div>
     </div>
@@ -68,48 +71,54 @@
         const db = firebase.database();
         const entriesRef = db.ref('entries');
 
-        // Defaults to March 29, 2026 based on your current session
         const getTodayStr = () => new Date().toISOString().split('T')[0];
 
         entriesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             const body = document.getElementById('tableBody');
+            const counter = document.getElementById('entryCounter');
             body.innerHTML = '';
             
             if (data) {
-                Object.keys(data).reverse().forEach((key) => {
+                const keys = Object.keys(data).reverse();
+                // Update Counter
+                counter.innerText = `Total Entries: ${keys.length}`;
+
+                keys.forEach((key) => {
                     const item = data[key];
                     const isDefault = item.task === "Add your Entry";
                     
                     const tr = document.createElement('tr');
                     tr.className = "task-row group";
                     tr.innerHTML = `
-                        <td class="px-8 py-6">
+                        <td class="px-8 py-5 col-sep">
                             <input type="date" 
                                    value="${item.displayDate || getTodayStr()}" 
                                    onchange="updateRow('${key}', 'displayDate', this.value)"
-                                   class="bg-transparent text-sm font-bold text-blue-500 outline-none cursor-pointer">
+                                   class="bg-transparent text-sm font-bold text-sky-600 outline-none cursor-pointer">
                         </td>
-                        <td class="px-8 py-6">
+                        <td class="px-8 py-5 col-sep">
                             <input type="text" 
                                    value="${item.task}" 
                                    onfocus="if(this.value==='Add your Entry') this.select()"
                                    onchange="updateRow('${key}', 'task', this.value)" 
-                                   class="w-full bg-transparent font-bold text-slate-700 outline-none focus:text-blue-600 transition-colors ${isDefault ? 'default-placeholder' : ''}">
+                                   class="w-full bg-transparent font-semibold text-slate-700 outline-none focus:text-sky-600 transition-colors ${isDefault ? 'default-placeholder' : ''}">
                         </td>
-                        <td class="px-8 py-6 text-center">
+                        <td class="px-8 py-5 text-center col-sep">
                             <select onchange="updateRow('${key}', 'status', this.value)" 
-                                    class="p-2 px-4 rounded-full text-[10px] font-black uppercase border-2 cursor-pointer transition-all ${item.status === 'Done' ? 'bg-green-50 border-green-200 text-green-600' : 'bg-blue-50 border-blue-100 text-blue-600'}">
+                                    class="p-2 px-4 rounded-full text-[10px] font-black uppercase border cursor-pointer transition-all ${item.status === 'Done' ? 'bg-green-50 border-green-200 text-green-600' : 'bg-sky-50 border-sky-200 text-sky-600'}">
                                 <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
                                 <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
                             </select>
                         </td>
-                        <td class="px-8 py-6 text-right">
-                            <button onclick="deleteRow('${key}')" class="text-slate-300 hover:text-red-500 transition-colors font-bold text-lg">✕</button>
+                        <td class="px-8 py-5 text-center">
+                            <button onclick="deleteRow('${key}')" class="text-slate-300 hover:text-red-400 transition-colors font-bold text-lg">✕</button>
                         </td>
                     `;
                     body.appendChild(tr);
                 });
+            } else {
+                counter.innerText = `Total Entries: 0`;
             }
         });
 
@@ -127,7 +136,7 @@
         }
 
         function deleteRow(key) {
-            if(confirm("Permanently remove this strategic idea?")) db.ref('entries/' + key).remove();
+            if(confirm("Permanently remove this entry?")) db.ref('entries/' + key).remove();
         }
 
         function exportToCSV() {
@@ -144,7 +153,7 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.setAttribute("href", url);
-                link.setAttribute("download", `Aijaz_Strategy_Export_${getTodayStr()}.csv`);
+                link.setAttribute("download", `Aijaz_Board_Export_${getTodayStr()}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
