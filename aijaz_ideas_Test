@@ -2,22 +2,22 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Points Tracker</title>
+    <title>Local Test - Daily Points</title>
     <style>
         body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
-        .card { background: white; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 12px; shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card { background: white; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 12px; shadow: 0 2px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; }
         td { padding: 12px; border-bottom: 1px solid #dee2e6; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; float: right; }
+        .btn { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; float: right; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <button class="btn" onclick="addRow()">+ Add New Point</button>
-    <h2>My Daily Points</h2>
+    <h2 style="color: #333;">My Daily Points</h2>
     
     <table>
         <thead>
@@ -27,23 +27,19 @@
                 <th style="width: 120px;">Status</th>
             </tr>
         </thead>
-        <tbody id="masterTable">
-            </tbody>
+        <tbody id="masterTable"></tbody>
     </table>
 </div>
 
 <script>
-    // Initialize with 5 rows if empty
-    let myData = JSON.parse(localStorage.getItem('points_v1'));
-    if (!myData || myData.length === 0) {
-        myData = [
-            {t: "Point 1", d: "2026-03-29", s: "Pending"},
-            {t: "Point 2", d: "2026-03-29", s: "Pending"},
-            {t: "Point 3", d: "2026-03-29", s: "Pending"},
-            {t: "Point 4", d: "2026-03-29", s: "Pending"},
-            {t: "Point 5", d: "2026-03-29", s: "Pending"}
-        ];
-    }
+    // Initialize with 5 blank rows
+    let myData = JSON.parse(localStorage.getItem('local_test_points')) || [
+        {t: "", d: "2026-03-29", s: "Pending"},
+        {t: "", d: "2026-03-29", s: "Pending"},
+        {t: "", d: "2026-03-29", s: "Pending"},
+        {t: "", d: "2026-03-29", s: "Pending"},
+        {t: "", d: "2026-03-29", s: "Pending"}
+    ];
 
     function render() {
         const body = document.getElementById('masterTable');
@@ -51,7 +47,7 @@
         myData.forEach((item, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><input type="text" value="${item.t}" oninput="update(${index}, 't', this.value)"></td>
+                <td><input type="text" value="${item.t}" placeholder="Type here..." oninput="update(${index}, 't', this.value)"></td>
                 <td><input type="date" value="${item.d}" onchange="update(${index}, 'd', this.value)"></td>
                 <td>
                     <select onchange="update(${index}, 's', this.value)">
@@ -62,12 +58,12 @@
             `;
             body.appendChild(row);
         });
-        localStorage.setItem('points_v1', JSON.stringify(myData));
+        localStorage.setItem('local_test_points', JSON.stringify(myData));
     }
 
     function update(i, key, val) {
         myData[i][key] = val;
-        localStorage.setItem('points_v1', JSON.stringify(myData));
+        localStorage.setItem('local_test_points', JSON.stringify(myData));
     }
 
     function addRow() {
@@ -77,6 +73,5 @@
 
     render();
 </script>
-
 </body>
 </html>
