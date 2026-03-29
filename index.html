@@ -3,36 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz | Strategic Tracker</title>
+    <title>Aijaz | Cloud Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #0f172a; min-height: 100vh; font-family: sans-serif; }
-        .glass-card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-done { background: #dcfce7; color: #166534; }
-    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
-<body class="p-4 md:p-10">
+<body class="bg-slate-900 p-4 md:p-10 font-sans text-slate-800">
 
-    <div class="max-w-5xl mx-auto glass-card overflow-hidden">
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div class="p-6 border-b flex justify-between items-center bg-white">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">Execution Board</h1>
-                <p class="text-slate-400 text-sm" id="todayText"></p>
-            </div>
-            <button onclick="createNewEntry()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-transform active:scale-95">
+            <h1 class="text-2xl font-black">Execution Board</h1>
+            <button onclick="addEntry()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
                 + Add Entry
             </button>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-slate-50">
-                    <tr class="text-left text-xs text-slate-400 uppercase">
-                        <th class="px-6 py-4">Task Description</th>
-                        <th class="px-6 py-4 w-48">Date</th>
-                        <th class="px-6 py-4 w-32 text-center">Status</th>
-                        <th class="px-6 py-4 w-16"></th>
+                <thead class="bg-slate-50 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <tr>
+                        <th class="px-8 py-4 text-left">Task</th>
+                        <th class="px-8 py-4 w-40 text-center">Status</th>
+                        <th class="px-8 py-4 w-16"></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody" class="divide-y divide-slate-100">
@@ -42,95 +34,68 @@
     </div>
 
     <script>
-        // Use a unique key to avoid conflicts with old broken versions
-        const STORAGE_KEY = 'aijaz_final_v1';
-        
-        // Helper to get today's date
-        const getToday = () => new Date().toISOString().split('T')[0];
-        document.getElementById('todayText').innerText = new Date().toDateString();
+        // PASTE YOUR KEYS FROM FIREBASE SETTINGS HERE
+        const firebaseConfig = {
+            apiKey: "PASTE_YOUR_API_KEY_HERE",
+            authDomain: "aijazideas.firebaseapp.com",
+            databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "aijazideas",
+            storageBucket: "aijazideas.appspot.com",
+            messagingSenderId: "PASTE_SENDER_ID",
+            appId: "PASTE_APP_ID"
+        };
 
-        // Load data safely
-        let myData = [];
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            myData = saved ? JSON.parse(saved) : [
-                { task: "Welcome back, Aijaz", date: getToday(), status: "Pending" }
-            ];
-        } catch (e) {
-            myData = []; // Reset if data is corrupted
-        }
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const entriesRef = db.ref('entries');
 
-        function render() {
+        // Listen for data
+        entriesRef.on('value', (snapshot) => {
+            const data = snapshot.val();
             const body = document.getElementById('tableBody');
             body.innerHTML = '';
             
-            myData.forEach((item, i) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="px-6 py-4">
-                        <input type="text" value="${item.task}" oninput="update(${i}, 'task', this.value)" 
-                               placeholder="Enter task..." class="w-full bg-transparent outline-none font-medium text-slate-700">
-                    </td>
-                    <td class="px-6 py-4">
-                        <input type="date" value="${item.date}" onchange="update(${i}, 'date', this.value)" 
-                               class="text-sm text-slate-500 bg-transparent outline-none">
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <select onchange="update(${i}, 'status', this.value)" 
-                                class="text-[10px] font-bold uppercase p-1 rounded-md outline-none cursor-pointer ${item.status === 'Done' ? 'status-done' : 'status-pending'}">
-                            <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                            <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
-                        </select>
-                    </td>
-                    <td class="px-6 py-4">
-                        <button onclick="deleteRow(${i})" class="text-slate-300 hover:text-red-500 transition-colors">✕</button>
-                    </td>
-                `;
-                body.appendChild(tr);
-            });
-        }
-
-        function update(index, key, value) {
-            myData[index][key] = value;
-            save();
-            if (key === 'status') render();
-        }
-
-        function createNewEntry() {
-            // Unshift adds to the top of the list
-            myData.unshift({ 
-                task: "", 
-                date: getToday(), 
-                status: "Pending" 
-            });
-            save();
-            render();
-        }
-
-        function deleteRow(index) {
-            if(confirm("Delete this entry?")) {
-                myData.splice(index, 1);
-                save();
-                render();
+            if (data) {
+                Object.keys(data).reverse().forEach((key) => {
+                    const item = data[key];
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-8 py-5">
+                            <input type="text" value="${item.task}" onchange="updateRow('${key}', 'task', this.value)" 
+                                   class="w-full bg-transparent font-bold outline-none">
+                        </td>
+                        <td class="px-8 py-5 text-center">
+                            <select onchange="updateRow('${key}', 'status', this.value)" 
+                                    class="p-2 rounded-lg text-[10px] font-black uppercase ${item.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+                                <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
+                            </select>
+                        </td>
+                        <td class="px-8 py-5">
+                            <button onclick="deleteRow('${key}')" class="text-slate-200 hover:text-red-500">✕</button>
+                        </td>
+                    `;
+                    body.appendChild(tr);
+                });
             }
+        });
+
+        function addEntry() {
+            entriesRef.push({
+                task: "New Task",
+                status: "Pending",
+                timestamp: Date.now()
+            });
         }
 
-        function save() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(myData));
+        function updateRow(key, field, value) {
+            db.ref('entries/' + key).update({ [field]: value });
         }
 
-        // Run on load
-        render();
+        function deleteRow(key) {
+            if(confirm("Delete entry?")) db.ref('entries/' + key).remove();
+        }
     </script>
-   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "aijazideas.firebaseapp.com",
-    // ADD THIS LINE BELOW (Make sure it matches your Singapore URL)
-    databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app", 
-    projectId: "aijazideas",
-    storageBucket: "aijazideas.appspot.com",
-    messagingSenderId: "YOUR_ID",
-    appId: "YOUR_APP_ID"
-};
 </body>
 </html>
