@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         body { background-color: #f0f9ff; min-height: 100vh; }
-        .editable-cell { border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .grid-cell { border: 1px solid #e2e8f0; transition: all 0.2s; }
         .editable-cell:hover, .editable-cell:focus-within {
             border-color: #7dd3fc;
             background-color: #ffffff;
@@ -45,13 +45,13 @@
         </div>
 
         <div class="overflow-x-auto p-2 md:p-4">
-            <table class="w-full border-separate border-spacing-y-2">
+            <table class="w-full border-separate border-spacing-x-2 border-spacing-y-2">
                 <thead>
-                    <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <th class="px-4 py-2 text-left w-32 md:w-48">Entry Date</th>
-                        <th class="px-4 py-2 text-left">Task Description</th>
-                        <th class="px-4 py-2 w-24 md:w-40 text-center">Status</th>
-                        <th class="px-4 py-2 w-8"></th>
+                    <tr class="text-slate-600 uppercase tracking-wide">
+                        <th class="grid-cell rounded-lg px-4 py-3 text-left w-32 md:w-48 bg-sky-50/50 text-xs md:text-sm font-black">Entry Date</th>
+                        <th class="grid-cell rounded-lg px-4 py-3 text-left bg-white text-xs md:text-sm font-black">Task Description</th>
+                        <th class="grid-cell rounded-lg px-4 py-3 w-24 md:w-40 text-center bg-sky-50/50 text-xs md:text-sm font-black">Status</th>
+                        <th class="w-8"></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -81,7 +81,6 @@
         const db = firebase.database();
         const entriesRef = db.ref('entries');
 
-        // Pagination State
         let allData = [];
         let currentPage = 1;
         const entriesPerPage = 4;
@@ -113,18 +112,18 @@
                 const isDefault = item.task === "Add your Entry";
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="editable-cell rounded-lg px-2 md:px-4 py-3 bg-slate-50/50">
+                    <td class="grid-cell editable-cell rounded-lg px-2 md:px-4 py-3 bg-slate-50/50">
                         <input type="date" value="${item.displayDate || getTodayStr()}" 
                                onchange="updateRow('${item.id}', 'displayDate', this.value)"
                                class="bg-transparent w-full text-[10px] md:text-xs font-bold text-sky-600 outline-none cursor-pointer uppercase">
                     </td>
-                    <td class="editable-cell rounded-lg px-2 md:px-4 py-3">
+                    <td class="grid-cell editable-cell rounded-lg px-2 md:px-4 py-3">
                         <input type="text" value="${item.task}" 
                                onfocus="if(this.value==='Add your Entry') this.select()"
                                onchange="updateRow('${item.id}', 'task', this.value)" 
                                class="w-full bg-transparent font-medium text-slate-700 outline-none text-xs md:text-sm ${isDefault ? 'default-placeholder' : ''}">
                     </td>
-                    <td class="editable-cell rounded-lg px-1 md:px-2 py-3 bg-slate-50/50 text-center">
+                    <td class="grid-cell editable-cell rounded-lg px-1 md:px-2 py-3 bg-slate-50/50 text-center">
                         <select onchange="updateRow('${item.id}', 'status', this.value)" 
                                 class="bg-transparent w-full text-[9px] md:text-[10px] font-black uppercase text-center cursor-pointer outline-none ${item.status === 'Done' ? 'text-green-500' : 'text-sky-500'}">
                             <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
@@ -132,7 +131,7 @@
                         </select>
                     </td>
                     <td class="text-center">
-                        <button onclick="deleteRow('${item.id}')" class="text-slate-200 hover:text-red-400 p-1 md:p-2">
+                        <button onclick="deleteRow('${item.id}')" class="text-slate-200 hover:text-red-400 p-1 md:p-2 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -142,7 +141,6 @@
                 body.appendChild(tr);
             });
 
-            // Update Pagination UI
             pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
             document.getElementById('prevBtn').disabled = currentPage === 1;
             document.getElementById('nextBtn').disabled = currentPage === totalPages;
@@ -161,7 +159,7 @@
                 displayDate: getTodayStr(),
                 timestamp: Date.now()
             }).then(() => {
-                currentPage = 1; // Go to first page to see new entry
+                currentPage = 1;
             });
         }
 
