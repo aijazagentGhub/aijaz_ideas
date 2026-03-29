@@ -28,7 +28,7 @@
         <div class="p-4 md:p-6 border-b border-sky-50 flex flex-col md:flex-row gap-4 justify-between items-center bg-white">
             <div class="text-center md:text-left">
                 <h1 class="text-xl md:text-2xl font-black text-sky-500 uppercase tracking-tight">
-                    <i class="not-italic font-black">AIJAZ</i> <span class="italic font-black">Execution Board</span>
+                    <i class="not-italic font-black">Aijaz</i> <span class="italic font-black">- Open item/ideas</span>
                 </h1>
                 <div class="flex items-center justify-center md:justify-start gap-2 mt-1">
                     <span id="entryCounter" class="bg-sky-100 text-sky-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0 ENTRIES</span>
@@ -38,7 +38,7 @@
                 <button onclick="exportToCSV()" class="flex-1 md:flex-none text-sky-500 px-4 py-2 rounded-lg font-bold text-xs hover:bg-sky-50 transition-colors border border-sky-100">
                     Export
                 </button>
-                <button onclick="addEntry()" class="flex-1 md:flex-none bg-sky-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all active:scale-95 text-xs">
+                <button onclick="addEntry()" class="bg-sky-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all active:scale-95 text-xs">
                     + New Entry
                 </button>
             </div>
@@ -47,10 +47,10 @@
         <div class="overflow-x-auto p-2 md:p-4">
             <table class="w-full border-separate border-spacing-x-2 border-spacing-y-2">
                 <thead>
-                    <tr class="text-slate-600 uppercase tracking-wide">
-                        <th class="grid-cell rounded-lg px-4 py-3 text-left w-32 md:w-48 bg-sky-50/50 text-xs md:text-sm font-black">Entry Date</th>
-                        <th class="grid-cell rounded-lg px-4 py-3 text-left bg-white text-xs md:text-sm font-black">Task Description</th>
-                        <th class="grid-cell rounded-lg px-4 py-3 w-24 md:w-40 text-center bg-sky-50/50 text-xs md:text-sm font-black">Status</th>
+                    <tr>
+                        <th class="grid-cell rounded-lg px-4 py-3 text-left w-32 md:w-48 bg-sky-50/50 text-xs md:text-sm font-black text-blue-600 uppercase tracking-wide">Entry Date</th>
+                        <th class="grid-cell rounded-lg px-4 py-3 text-left bg-white text-xs md:text-sm font-black text-blue-600 uppercase tracking-wide">Task Description</th>
+                        <th class="grid-cell rounded-lg px-4 py-3 w-24 md:w-40 text-center bg-sky-50/50 text-xs md:text-sm font-black text-blue-600 uppercase tracking-wide">Status</th>
                         <th class="w-8"></th>
                     </tr>
                 </thead>
