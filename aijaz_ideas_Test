@@ -1,87 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Daily Points</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>My Points Tracker</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
+        .card { background: white; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 12px; shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #dee2e6; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; float: right; }
+    </style>
 </head>
-<body class="bg-slate-100 p-4 md:p-10">
-    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6">
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <h1 class="text-2xl font-bold text-gray-800">Daily Points Tracker</h1>
-            <button onclick="addRow()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ Add Row</button>
-        </div>
+<body>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th class="p-3 border-b font-semibold text-gray-600">Point / Description</th>
-                        <th class="p-3 border-b font-semibold text-gray-600">Date</th>
-                        <th class="p-3 border-b font-semibold text-gray-600">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    </tbody>
-            </table>
-        </div>
-    </div>
+<div class="card">
+    <button class="btn" onclick="addRow()">+ Add New Point</button>
+    <h2>My Daily Points</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Point Description</th>
+                <th style="width: 150px;">Date</th>
+                <th style="width: 120px;">Status</th>
+            </tr>
+        </thead>
+        <tbody id="masterTable">
+            </tbody>
+    </table>
+</div>
 
-    <script>
-        // Use existing data or create 5 blank rows for the first time
-        let points = JSON.parse(localStorage.getItem('myDailyData'));
-        
-        if (!points || points.length === 0) {
-            points = Array(5).fill().map(() => ({
-                text: '',
-                date: new Date().toISOString().split('T')[0],
-                status: 'Pending'
-            }));
-        }
+<script>
+    // Initialize with 5 rows if empty
+    let myData = JSON.parse(localStorage.getItem('points_v1'));
+    if (!myData || myData.length === 0) {
+        myData = [
+            {t: "Point 1", d: "2026-03-29", s: "Pending"},
+            {t: "Point 2", d: "2026-03-29", s: "Pending"},
+            {t: "Point 3", d: "2026-03-29", s: "Pending"},
+            {t: "Point 4", d: "2026-03-29", s: "Pending"},
+            {t: "Point 5", d: "2026-03-29", s: "Pending"}
+        ];
+    }
 
-        function save() {
-            localStorage.setItem('myDailyData', JSON.stringify(points));
-        }
+    function render() {
+        const body = document.getElementById('masterTable');
+        body.innerHTML = "";
+        myData.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" value="${item.t}" oninput="update(${index}, 't', this.value)"></td>
+                <td><input type="date" value="${item.d}" onchange="update(${index}, 'd', this.value)"></td>
+                <td>
+                    <select onchange="update(${index}, 's', this.value)">
+                        <option ${item.s=='Pending'?'selected':''}>Pending</option>
+                        <option ${item.s=='Done'?'selected':''}>Done</option>
+                    </select>
+                </td>
+            `;
+            body.appendChild(row);
+        });
+        localStorage.setItem('points_v1', JSON.stringify(myData));
+    }
 
-        function render() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            points.forEach((item, i) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50";
-                tr.innerHTML = `
-                    <td class="p-3 border-b">
-                        <input type="text" value="${item.text}" oninput="update(${i}, 'text', this.value)" 
-                               placeholder="Type point here..." class="w-full bg-transparent outline-none border-b border-transparent focus:border-blue-400">
-                    </td>
-                    <td class="p-3 border-b">
-                        <input type="date" value="${item.date}" onchange="update(${i}, 'date', this.value)" class="bg-transparent outline-none">
-                    </td>
-                    <td class="p-3 border-b">
-                        <select onchange="update(${i}, 'status', this.value)" class="bg-transparent font-medium outline-none">
-                            <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                            <option ${item.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                            <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
-                        </select>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+    function update(i, key, val) {
+        myData[i][key] = val;
+        localStorage.setItem('points_v1', JSON.stringify(myData));
+    }
 
-        function update(index, key, value) {
-            points[index][key] = value;
-            save();
-        }
-
-        function addRow() {
-            points.push({ text: '', date: new Date().toISOString().split('T')[0], status: 'Pending' });
-            save();
-            render();
-        }
-
+    function addRow() {
+        myData.push({t: "", d: new Date().toISOString().split('T')[0], s: "Pending"});
         render();
-    </script>
+    }
+
+    render();
+</script>
+
 </body>
 </html>
