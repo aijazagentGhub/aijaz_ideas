@@ -8,65 +8,64 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        /* Ultra Light Ice Blue Background */
-        body {
-            background-color: #f0f9ff;
-            min-height: 100vh;
-        }
-        
-        /* Grid styling to make it feel like a professional spreadsheet */
-        .editable-cell {
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
-        }
+        body { background-color: #f0f9ff; min-height: 100vh; }
+        .editable-cell { border: 1px solid #e2e8f0; transition: all 0.2s; }
         .editable-cell:hover, .editable-cell:focus-within {
             border-color: #7dd3fc;
             background-color: #ffffff;
             box-shadow: inset 0 0 0 1px #7dd3fc;
         }
-
         .default-placeholder { opacity: 0.3; font-weight: normal !important; }
-        
-        /* Date picker custom icon color */
         input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(65%) sepia(50%) saturate(500%) hue-rotate(175deg);
             cursor: pointer;
         }
     </style>
 </head>
-<body class="p-4 md:p-8 font-sans text-slate-700">
+<body class="p-2 md:p-8 font-sans text-slate-700">
 
     <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden border border-sky-100">
-        <div class="p-6 border-b border-sky-50 flex flex-wrap gap-4 justify-between items-center bg-white">
-            <div>
-                <h1 class="text-2xl font-black text-sky-500 uppercase tracking-tight">Execution Board</h1>
-                <div class="flex items-center gap-2 mt-1">
+        <div class="p-4 md:p-6 border-b border-sky-50 flex flex-col md:flex-row gap-4 justify-between items-center bg-white">
+            <div class="text-center md:text-left">
+                <h1 class="text-xl md:text-2xl font-black text-sky-500 uppercase tracking-tight">
+                    <i class="not-italic font-black">AIJAZ</i> <span class="italic font-black">Execution Board</span>
+                </h1>
+                <div class="flex items-center justify-center md:justify-start gap-2 mt-1">
                     <span id="entryCounter" class="bg-sky-100 text-sky-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0 ENTRIES</span>
-                    <span class="text-slate-300 text-[10px] font-bold">| UPDATED REAL-TIME</span>
                 </div>
             </div>
-            <div class="flex gap-3">
-                <button onclick="exportToCSV()" class="text-sky-500 px-5 py-2 rounded-lg font-bold text-sm hover:bg-sky-50 transition-colors">
-                    Export Data
+            <div class="flex gap-2 w-full md:w-auto">
+                <button onclick="exportToCSV()" class="flex-1 md:flex-none text-sky-500 px-4 py-2 rounded-lg font-bold text-xs hover:bg-sky-50 transition-colors border border-sky-100">
+                    Export
                 </button>
-                <button onclick="addEntry()" class="bg-sky-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all active:scale-95 text-sm">
+                <button onclick="addEntry()" class="flex-1 md:flex-none bg-sky-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm hover:bg-sky-600 transition-all active:scale-95 text-xs">
                     + New Entry
                 </button>
             </div>
         </div>
 
-        <div class="overflow-x-auto p-4">
-            <table class="w-full border-separate border-spacing-2">
+        <div class="overflow-x-auto p-2 md:p-4">
+            <table class="w-full border-separate border-spacing-y-2">
                 <thead>
                     <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <th class="px-4 py-2 text-left w-48">Execution Date</th>
-                        <th class="px-4 py-2 text-left">Task / Strategy Description</th>
-                        <th class="px-4 py-2 w-40 text-center">Status</th>
-                        <th class="px-4 py-2 w-12"></th>
+                        <th class="px-4 py-2 text-left w-32 md:w-48">Entry Date</th>
+                        <th class="px-4 py-2 text-left">Task Description</th>
+                        <th class="px-4 py-2 w-24 md:w-40 text-center">Status</th>
+                        <th class="px-4 py-2 w-8"></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
+        </div>
+
+        <div id="paginationControls" class="p-4 border-t border-sky-50 flex justify-between items-center bg-slate-50/50">
+            <button id="prevBtn" onclick="changePage(-1)" class="text-xs font-bold text-sky-600 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1">
+                ← Previous
+            </button>
+            <span id="pageIndicator" class="text-[10px] font-black text-slate-400 uppercase">Page 1 of 1</span>
+            <button id="nextBtn" onclick="changePage(1)" class="text-xs font-bold text-sky-600 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1">
+                Next →
+            </button>
         </div>
     </div>
 
@@ -82,62 +81,78 @@
         const db = firebase.database();
         const entriesRef = db.ref('entries');
 
+        // Pagination State
+        let allData = [];
+        let currentPage = 1;
+        const entriesPerPage = 4;
+
         const getTodayStr = () => new Date().toISOString().split('T')[0];
 
         entriesRef.on('value', (snapshot) => {
             const data = snapshot.val();
+            allData = data ? Object.keys(data).reverse().map(key => ({ id: key, ...data[key] })) : [];
+            renderTable();
+        });
+
+        function renderTable() {
             const body = document.getElementById('tableBody');
             const counter = document.getElementById('entryCounter');
-            body.innerHTML = '';
+            const pageIndicator = document.getElementById('pageIndicator');
             
-            if (data) {
-                const keys = Object.keys(data).reverse();
-                counter.innerText = `${keys.length} ENTRIES`;
+            body.innerHTML = '';
+            counter.innerText = `${allData.length} ENTRIES`;
 
-                keys.forEach((key) => {
-                    const item = data[key];
-                    const isDefault = item.task === "Add your Entry";
-                    
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="editable-cell rounded-lg px-4 py-3 bg-slate-50/50">
-                            <input type="date" 
-                                   value="${item.displayDate || getTodayStr()}" 
-                                   onchange="updateRow('${key}', 'displayDate', this.value)"
-                                   class="bg-transparent w-full text-xs font-bold text-sky-600 outline-none cursor-pointer uppercase">
-                        </td>
-                        
-                        <td class="editable-cell rounded-lg px-4 py-3">
-                            <input type="text" 
-                                   value="${item.task}" 
-                                   onfocus="if(this.value==='Add your Entry') this.select()"
-                                   onchange="updateRow('${key}', 'task', this.value)" 
-                                   placeholder="Type something..."
-                                   class="w-full bg-transparent font-medium text-slate-700 outline-none text-sm ${isDefault ? 'default-placeholder' : ''}">
-                        </td>
-                        
-                        <td class="editable-cell rounded-lg px-2 py-3 bg-slate-50/50 text-center">
-                            <select onchange="updateRow('${key}', 'status', this.value)" 
-                                    class="bg-transparent w-full text-[10px] font-black uppercase text-center cursor-pointer outline-none ${item.status === 'Done' ? 'text-green-500' : 'text-sky-500'}">
-                                <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
-                            </select>
-                        </td>
-                        
-                        <td class="text-center">
-                            <button onclick="deleteRow('${key}')" class="text-slate-200 hover:text-red-400 transition-colors p-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </td>
-                    `;
-                    body.appendChild(tr);
-                });
-            } else {
-                counter.innerText = `0 ENTRIES`;
-            }
-        });
+            const totalPages = Math.ceil(allData.length / entriesPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * entriesPerPage;
+            const end = start + entriesPerPage;
+            const paginatedItems = allData.slice(start, end);
+
+            paginatedItems.forEach((item) => {
+                const isDefault = item.task === "Add your Entry";
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="editable-cell rounded-lg px-2 md:px-4 py-3 bg-slate-50/50">
+                        <input type="date" value="${item.displayDate || getTodayStr()}" 
+                               onchange="updateRow('${item.id}', 'displayDate', this.value)"
+                               class="bg-transparent w-full text-[10px] md:text-xs font-bold text-sky-600 outline-none cursor-pointer uppercase">
+                    </td>
+                    <td class="editable-cell rounded-lg px-2 md:px-4 py-3">
+                        <input type="text" value="${item.task}" 
+                               onfocus="if(this.value==='Add your Entry') this.select()"
+                               onchange="updateRow('${item.id}', 'task', this.value)" 
+                               class="w-full bg-transparent font-medium text-slate-700 outline-none text-xs md:text-sm ${isDefault ? 'default-placeholder' : ''}">
+                    </td>
+                    <td class="editable-cell rounded-lg px-1 md:px-2 py-3 bg-slate-50/50 text-center">
+                        <select onchange="updateRow('${item.id}', 'status', this.value)" 
+                                class="bg-transparent w-full text-[9px] md:text-[10px] font-black uppercase text-center cursor-pointer outline-none ${item.status === 'Done' ? 'text-green-500' : 'text-sky-500'}">
+                            <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <button onclick="deleteRow('${item.id}')" class="text-slate-200 hover:text-red-400 p-1 md:p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+
+            // Update Pagination UI
+            pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            document.getElementById('paginationControls').style.display = allData.length > entriesPerPage ? 'flex' : 'none';
+        }
+
+        function changePage(step) {
+            currentPage += step;
+            renderTable();
+        }
 
         function addEntry() {
             entriesRef.push({
@@ -145,6 +160,8 @@
                 status: "Pending",
                 displayDate: getTodayStr(),
                 timestamp: Date.now()
+            }).then(() => {
+                currentPage = 1; // Go to first page to see new entry
             });
         }
 
@@ -157,24 +174,20 @@
         }
 
         function exportToCSV() {
-            entriesRef.once('value', (snapshot) => {
-                const data = snapshot.val();
-                if (!data) return alert("Nothing to export yet!");
-                let csvContent = "Date,Task Description,Status\n";
-                Object.values(data).forEach(item => {
-                    const date = item.displayDate || "N/A";
-                    const cleanTask = item.task.replace(/,/g, " ");
-                    csvContent += `${date},${cleanTask},${item.status}\n`;
-                });
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.setAttribute("href", url);
-                link.setAttribute("download", `Strategy_Board_${getTodayStr()}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            if (allData.length === 0) return alert("Nothing to export!");
+            let csvContent = "Entry Date,Task Description,Status\n";
+            allData.forEach(item => {
+                const cleanTask = item.task.replace(/,/g, " ");
+                csvContent += `${item.displayDate || 'N/A'},${cleanTask},${item.status}\n`;
             });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Aijaz_Strategy_${getTodayStr()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
