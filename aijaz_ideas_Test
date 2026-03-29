@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Points</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <div class="flex justify-between mb-4">
+            <h2 class="text-xl font-bold">Daily Points Tracker</h2>
+            <button onclick="addRow()" class="bg-blue-600 text-white px-3 py-1 rounded">+ Add</button>
+        </div>
+        <div id="container" class="space-y-3"></div>
+    </div>
+    <script>
+        let data = JSON.parse(localStorage.getItem('myPoints')) || [];
+        function save() { localStorage.setItem('myPoints', JSON.stringify(data)); }
+        function render() {
+            const cont = document.getElementById('container');
+            cont.innerHTML = '';
+            data.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = "flex gap-2 border-b pb-2";
+                div.innerHTML = `
+                    <input type="text" value="${item.t}" onchange="data[${i}].t=this.value;save()" class="flex-1 outline-none">
+                    <input type="date" value="${item.d}" onchange="data[${i}].d=this.value;save()" class="text-sm">
+                    <select onchange="data[${i}].s=this.value;save()">
+                        <option ${item.s=='Pending'?'selected':''}>Pending</option>
+                        <option ${item.s=='Done'?'selected':''}>Done</option>
+                    </select>
+                `;
+                cont.appendChild(div);
+            });
+        }
+        function addRow() { 
+            data.unshift({t:'', d:new Date().toISOString().split('T')[0], s:'Pending'}); 
+            save(); render(); 
+        }
+        render();
+    </script>
+</body>
+</html>
