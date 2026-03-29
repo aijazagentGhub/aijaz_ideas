@@ -7,17 +7,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        .task-row:hover { background-color: #fff5f5; transition: 0.2s; }
+        .default-placeholder { opacity: 0.3; font-weight: normal !important; }
+        
+        /* Custom styling to make the date input look clean in the red theme */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(27%) sepia(91%) saturate(2352%) hue-rotate(339deg) brightness(94%) contrast(92%);
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 p-4 md:p-10 font-sans">
+<body class="bg-red-600 p-4 md:p-10 font-sans">
 
-    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div class="p-6 border-b flex flex-wrap gap-4 justify-between items-center">
-            <h1 class="text-2xl font-black text-slate-800">Aijaz Execution Board</h1>
-            <div class="flex gap-2">
-                <button onclick="exportToCSV()" class="bg-slate-100 text-slate-600 px-6 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors active:scale-95">
-                    Export All Ideas
+    <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-white">
+        <div class="p-6 border-b border-red-100 flex flex-wrap gap-4 justify-between items-center bg-white">
+            <h1 class="text-2xl font-black text-red-600 uppercase tracking-tighter">Aijaz Execution Board</h1>
+            <div class="flex gap-3">
+                <button onclick="exportToCSV()" class="border-2 border-red-600 text-red-600 px-5 py-2 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95">
+                    Export Ideas
                 </button>
-                <button onclick="addEntry()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
+                <button onclick="addEntry()" class="bg-red-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-red-700 hover:shadow-red-200 transition-all active:scale-95">
                     + New Entry
                 </button>
             </div>
@@ -25,20 +35,20 @@
 
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-slate-50 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                <thead class="bg-red-50 text-xs font-bold text-red-400 uppercase tracking-widest">
                     <tr>
+                        <th class="px-8 py-4 text-left w-48">Execution Date</th>
                         <th class="px-8 py-4 text-left">Task Description</th>
                         <th class="px-8 py-4 w-40 text-center">Status</th>
                         <th class="px-8 py-4 w-16"></th>
                     </tr>
                 </thead>
-                <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+                <tbody id="tableBody" class="divide-y divide-red-50"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0", 
             projectId: "aijazideas",
@@ -46,12 +56,13 @@
             databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
-        // 2. Initialize
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const entriesRef = db.ref('entries');
 
-        // 3. Listen for changes
+        // Helper to get YYYY-MM-DD for the date input
+        const getTodayStr = () => new Date().toISOString().split('T')[0];
+
         entriesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             const body = document.getElementById('tableBody');
@@ -60,21 +71,33 @@
             if (data) {
                 Object.keys(data).reverse().forEach((key) => {
                     const item = data[key];
+                    const isDefault = item.task === "Add your Entry";
+                    
                     const tr = document.createElement('tr');
+                    tr.className = "task-row group";
                     tr.innerHTML = `
                         <td class="px-8 py-5">
-                            <input type="text" value="${item.task}" onchange="updateRow('${key}', 'task', this.value)" 
-                                   class="w-full bg-transparent font-bold text-slate-700 outline-none">
+                            <input type="date" 
+                                   value="${item.displayDate || getTodayStr()}" 
+                                   onchange="updateRow('${key}', 'displayDate', this.value)"
+                                   class="bg-transparent text-sm font-bold text-red-600 outline-none cursor-pointer">
+                        </td>
+                        <td class="px-8 py-5">
+                            <input type="text" 
+                                   value="${item.task}" 
+                                   onfocus="if(this.value==='Add your Entry') this.select()"
+                                   onchange="updateRow('${key}', 'task', this.value)" 
+                                   class="w-full bg-transparent font-bold text-slate-800 outline-none focus:text-red-600 transition-colors ${isDefault ? 'default-placeholder' : ''}">
                         </td>
                         <td class="px-8 py-5 text-center">
                             <select onchange="updateRow('${key}', 'status', this.value)" 
-                                    class="p-2 rounded-lg text-[10px] font-black uppercase ${item.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+                                    class="p-2 rounded-lg text-[10px] font-black uppercase border-2 cursor-pointer ${item.status === 'Done' ? 'bg-green-50 border-green-200 text-green-600' : 'bg-red-50 border-red-100 text-red-600'}">
                                 <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
                                 <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
                             </select>
                         </td>
                         <td class="px-8 py-5">
-                            <button onclick="deleteRow('${key}')" class="text-slate-200 hover:text-red-500">✕</button>
+                            <button onclick="deleteRow('${key}')" class="text-red-100 hover:text-red-600 transition-colors font-bold">✕</button>
                         </td>
                     `;
                     body.appendChild(tr);
@@ -82,11 +105,11 @@
             }
         });
 
-        // 4. Actions
         function addEntry() {
             entriesRef.push({
-                task: "New Strategic Point",
+                task: "Add your Entry",
                 status: "Pending",
+                displayDate: getTodayStr(), // Sets the date at the moment of clicking "New Entry"
                 timestamp: Date.now()
             });
         }
@@ -96,32 +119,24 @@
         }
 
         function deleteRow(key) {
-            if(confirm("Delete?")) db.ref('entries/' + key).remove();
+            if(confirm("Delete this idea?")) db.ref('entries/' + key).remove();
         }
 
-        // 5. Export Functionality
         function exportToCSV() {
             entriesRef.once('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return alert("No data to export!");
-
-                // Create CSV Header
-                let csvContent = "Task Description,Status,Date\n";
-
-                // Add Rows
+                let csvContent = "Date,Task Description,Status\n";
                 Object.values(data).forEach(item => {
-                    const date = new Date(item.timestamp).toLocaleDateString();
-                    // Clean strings to prevent CSV breaking (removing commas)
+                    const date = item.displayDate || "N/A";
                     const cleanTask = item.task.replace(/,/g, " ");
-                    csvContent += `${cleanTask},${item.status},${date}\n`;
+                    csvContent += `${date},${cleanTask},${item.status}\n`;
                 });
-
-                // Create download link
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.setAttribute("href", url);
-                link.setAttribute("download", `Aijaz_Ideas_${new Date().toLocaleDateString()}.csv`);
+                link.setAttribute("download", `Aijaz_Ideas_${getTodayStr()}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
