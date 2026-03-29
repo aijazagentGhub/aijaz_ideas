@@ -1,15 +1,50 @@
 <!DOCTYPE html>
 <html>
-<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="font-family:sans-serif; padding:20px;">
-    <h2>My Daily Points (Live)</h2>
-    <table border="1" style="width:100%; border-collapse:collapse;">
-        <tr><th>Point</th><th>Status</th></tr>
-        <tr><td><input type="text" style="width:98%"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-        <tr><td><input type="text" style="width:98%"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-        <tr><td><input type="text" style="width:98%"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-        <tr><td><input type="text" style="width:98%"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
-        <tr><td><input type="text" style="width:98%"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Points Tracker</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { background: white; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 10px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; background: #eee; padding: 10px; border: 1px solid #ccc; }
+        td { padding: 5px; border: 1px solid #ccc; }
+        input, select { width: 100%; border: none; padding: 8px; box-sizing: border-box; outline: none; }
+        input:focus { background: #fffde7; }
+        .btn { background: #1a73e8; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; float: right; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="btn" onclick="addRow()">+ Add Row</button>
+    <h2 id="status">My Daily Points</h2>
+    
+    <table id="pointTable">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th style="width: 150px;">Date</th>
+                <th style="width: 100px;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><input type="text" placeholder="Point 1..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 2..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 3..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 4..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+            <tr><td><input type="text" placeholder="Point 5..."></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td></tr>
+        </tbody>
     </table>
+</div>
+
+<script>
+    function addRow() {
+        var table = document.getElementById("pointTable").getElementsByTagName('tbody')[0];
+        var newRow = table.insertRow();
+        newRow.innerHTML = '<td><input type="text"></td><td><input type="date"></td><td><select><option>Pending</option><option>Done</option></select></td>';
+    }
+</script>
+
 </body>
 </html>
