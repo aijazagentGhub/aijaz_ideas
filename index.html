@@ -11,11 +11,16 @@
 <body class="bg-slate-900 p-4 md:p-10 font-sans">
 
     <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div class="p-6 border-b flex justify-between items-center">
+        <div class="p-6 border-b flex flex-wrap gap-4 justify-between items-center">
             <h1 class="text-2xl font-black text-slate-800">Aijaz Execution Board</h1>
-            <button onclick="addEntry()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-                + New Entry
-            </button>
+            <div class="flex gap-2">
+                <button onclick="exportToCSV()" class="bg-slate-100 text-slate-600 px-6 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors active:scale-95">
+                    Export All Ideas
+                </button>
+                <button onclick="addEntry()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
+                    + New Entry
+                </button>
+            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -33,7 +38,7 @@
     </div>
 
     <script>
-        // 1. MANUALLY FILL THESE THREE VALUES FROM FIREBASE SETTINGS
+        // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0", 
             projectId: "aijazideas",
@@ -77,6 +82,7 @@
             }
         });
 
+        // 4. Actions
         function addEntry() {
             entriesRef.push({
                 task: "New Strategic Point",
@@ -91,6 +97,35 @@
 
         function deleteRow(key) {
             if(confirm("Delete?")) db.ref('entries/' + key).remove();
+        }
+
+        // 5. Export Functionality
+        function exportToCSV() {
+            entriesRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return alert("No data to export!");
+
+                // Create CSV Header
+                let csvContent = "Task Description,Status,Date\n";
+
+                // Add Rows
+                Object.values(data).forEach(item => {
+                    const date = new Date(item.timestamp).toLocaleDateString();
+                    // Clean strings to prevent CSV breaking (removing commas)
+                    const cleanTask = item.task.replace(/,/g, " ");
+                    csvContent += `${cleanTask},${item.status},${date}\n`;
+                });
+
+                // Create download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", `Aijaz_Ideas_${new Date().toLocaleDateString()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
         }
     </script>
 </body>
