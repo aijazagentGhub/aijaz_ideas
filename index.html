@@ -6,38 +6,21 @@
     <title>Aijaz | Strategic Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            background: #0f172a; /* Deep professional navy */
-            min-height: 100vh;
-            font-family: 'Inter', sans-serif;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-        }
-        /* Style for the date and select to look modern */
-        input[type="date"], select {
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
-        }
-        input[type="date"]:hover, select:hover {
-            border-color: #6366f1;
-            background: #f8fafc;
-        }
-        .status-badge-pending { background: #fef3c7; color: #92400e; }
-        .status-badge-done { background: #dcfce7; color: #166534; }
+        body { background: #0f172a; min-height: 100vh; font-family: sans-serif; }
+        .glass-card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-done { background: #dcfce7; color: #166534; }
     </style>
 </head>
-<body class="p-4 md:p-12">
+<body class="p-4 md:p-10">
 
     <div class="max-w-5xl mx-auto glass-card overflow-hidden">
-        <div class="p-8 border-b border-gray-100 bg-white flex flex-col md:flex-row md:items-center justify-between">
+        <div class="p-6 border-b flex justify-between items-center bg-white">
             <div>
-                <h1 class="text-4xl font-black text-slate-800 tracking-tight">Execution Board</h1>
-                <p class="text-slate-500 font-medium mt-1" id="currentDisplayDate"></p>
+                <h1 class="text-2xl font-bold text-slate-800">Execution Board</h1>
+                <p class="text-slate-400 text-sm" id="todayText"></p>
             </div>
-            <button onclick="addRow()" class="mt-4 md:mt-0 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg hover:shadow-indigo-200 active:scale-95">
+            <button onclick="createNewEntry()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-transform active:scale-95">
                 + Add Entry
             </button>
         </div>
@@ -45,18 +28,99 @@
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-slate-50">
-                    <tr>
-                        <th class="px-8 py-5 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Task Description</th>
-                        <th class="px-8 py-5 text-left text-xs font-bold text-slate-400 uppercase tracking-widest w-48">Date</th>
-                        <th class="px-8 py-5 text-center text-xs font-bold text-slate-400 uppercase tracking-widest w-40">Status</th>
+                    <tr class="text-left text-xs text-slate-400 uppercase">
+                        <th class="px-6 py-4">Task Description</th>
+                        <th class="px-6 py-4 w-48">Date</th>
+                        <th class="px-6 py-4 w-32 text-center">Status</th>
+                        <th class="px-6 py-4 w-16"></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody" class="divide-y divide-slate-100">
                     </tbody>
             </table>
         </div>
+    </div>
 
-        <div class="p-6 bg-slate-50 flex justify-between items-center border-t border-slate-100">
-            <div class="flex gap-6">
-                <div class="text-sm"><span class="text-slate-400">Total:</span> <span id="totalCount" class="font-bold text-slate-700">0</span></div>
-                <div class="text-sm"><span class="text
+    <script>
+        // Use a unique key to avoid conflicts with old broken versions
+        const STORAGE_KEY = 'aijaz_final_v1';
+        
+        // Helper to get today's date
+        const getToday = () => new Date().toISOString().split('T')[0];
+        document.getElementById('todayText').innerText = new Date().toDateString();
+
+        // Load data safely
+        let myData = [];
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            myData = saved ? JSON.parse(saved) : [
+                { task: "Welcome back, Aijaz", date: getToday(), status: "Pending" }
+            ];
+        } catch (e) {
+            myData = []; // Reset if data is corrupted
+        }
+
+        function render() {
+            const body = document.getElementById('tableBody');
+            body.innerHTML = '';
+            
+            myData.forEach((item, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4">
+                        <input type="text" value="${item.task}" oninput="update(${i}, 'task', this.value)" 
+                               placeholder="Enter task..." class="w-full bg-transparent outline-none font-medium text-slate-700">
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="date" value="${item.date}" onchange="update(${i}, 'date', this.value)" 
+                               class="text-sm text-slate-500 bg-transparent outline-none">
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <select onchange="update(${i}, 'status', this.value)" 
+                                class="text-[10px] font-bold uppercase p-1 rounded-md outline-none cursor-pointer ${item.status === 'Done' ? 'status-done' : 'status-pending'}">
+                            <option ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option ${item.status === 'Done' ? 'selected' : ''}>Done</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button onclick="deleteRow(${i})" class="text-slate-300 hover:text-red-500 transition-colors">✕</button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function update(index, key, value) {
+            myData[index][key] = value;
+            save();
+            if (key === 'status') render();
+        }
+
+        function createNewEntry() {
+            // Unshift adds to the top of the list
+            myData.unshift({ 
+                task: "", 
+                date: getToday(), 
+                status: "Pending" 
+            });
+            save();
+            render();
+        }
+
+        function deleteRow(index) {
+            if(confirm("Delete this entry?")) {
+                myData.splice(index, 1);
+                save();
+                render();
+            }
+        }
+
+        function save() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(myData));
+        }
+
+        // Run on load
+        render();
+    </script>
+</body>
+</html>
