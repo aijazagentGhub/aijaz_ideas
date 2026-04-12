@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Refined</title>
+    <title>Marathon Tracker - Status Restored</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -26,12 +26,13 @@
         .sidebar.collapsed .logo, .sidebar.collapsed .nav-text { display: none; }
         .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; white-space: nowrap; }
         .toggle-btn { position: absolute; top: 20px; right: -15px; background: var(--primary-blue); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 10; font-weight: bold; }
+        
         .nav-link { text-decoration: none; color: var(--primary-blue); font-weight: 600; padding: 12px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; gap: 10px; }
 
         /* --- MAIN CONTENT --- */
         .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
         
-        /* --- ICE BLUE BANNER WITH RED BORDER --- */
+        /* --- BANNER --- */
         @keyframes blinker { 50% { opacity: 0.3; } }
         .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; }
         .upcoming-banner { 
@@ -40,32 +41,34 @@
             padding: 12px 25px; 
             border-radius: 50px; 
             display: inline-block;
-            border: 3px solid var(--alert-red); /* Red Border Only */
+            border: 3px solid var(--alert-red);
             text-align: center;
             font-weight: 800;
-            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15);
             animation: blinker 0.6s linear 5;
         }
 
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
         .header-row h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #334155; }
 
+        /* --- STAT CARDS --- */
         .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; }
-        .stat-card p { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
+        .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
         /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
-        tbody tr:hover { background-color: var(--ice-blue) !important; }
+        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
 
-        /* Yearly Table Specific Adjustments */
-        .yearly-table { min-width: 600px; width: 100%; }
-        .yearly-table td, .yearly-table th { text-align: center; }
+        /* --- STATUS COLORS --- */
+        .status-Completed select { color: var(--color-completed) !important; font-weight: 800; }
+        .status-Pending select { color: var(--color-pending) !important; font-weight: 800; }
+        .status-Missed select { color: var(--color-missed) !important; font-weight: 800; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
         .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
@@ -74,7 +77,9 @@
 
         .pagination { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 30px; }
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
-        .page-btn.active { background: var(--primary-blue); color: white; }
+        .page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+
+        .yearly-table td { text-align: center; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -136,10 +141,10 @@
 
         <div class="pagination" id="paginationControls"></div>
 
-        <div class="table-container" style="max-width: 800px;">
+        <div class="table-container" style="max-width: 850px;">
             <table class="yearly-table">
                 <thead>
-                    <tr><th colspan="6" style="text-align: center; background: var(--ice-blue);">Yearly Summary Breakdown</th></tr>
+                    <tr><th colspan="6" style="text-align: center;">Yearly Summary Breakdown</th></tr>
                     <tr>
                         <th>Year</th><th>Total Runs</th><th>Comp.</th><th>Pend.</th><th>Miss.</th><th>Paid (₹)</th>
                     </tr>
@@ -225,7 +230,11 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div></td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
                     <td><input type="date" value="${item.date || ''}" onchange="updateDB('${item.id}', 'date', this.value)"></td>
-                    <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)"><option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option><option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option><option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option></select></td>
+                    <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)">
+                        <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
+                    </select></td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
                     <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer; font-size:1.2rem;" onclick="deleteFromDB('${item.id}')">×</button></td>
