@@ -34,7 +34,6 @@
 
         .nav-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 5px; transition: 0.2s; }
         .nav-link.active { color: var(--primary-orange); background-color: #fff7ed; }
-        .nav-link:hover:not(.active) { background-color: #f8fafc; color: var(--text-dark); }
 
         /* --- MAIN PANE --- */
         .main-pane { 
@@ -48,7 +47,6 @@
         .user-greeting h1 { font-family: 'Poppins', sans-serif; margin:0; font-weight:800; font-size:2rem; color: white; text-shadow: 0 4px 12px rgba(0,0,0,0.5); letter-spacing: -1px; } 
         
         .btn { border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: transform 0.1s; }
-        .btn:active { transform: scale(0.95); }
         .btn-new { background-color: white; border: 1px solid var(--border-color); color: var(--text-dark); }
         .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; box-shadow: 0 10px 15px -3px rgba(255,107,0,0.4); }
 
@@ -82,7 +80,6 @@
         @media (max-width: 768px) {
             .sidebar { position: fixed; left: -260px; }
             body.mobile-open .sidebar { left: 0; }
-            .main-pane { padding: 20px; } 
         }
     </style>
 </head>
@@ -105,7 +102,7 @@
         <div class="header-row">
             <div class="user-greeting">
                 <h1>AIJAZ MARATHON TRACKER</h1>
-                <p style="color: #cbd5e1; margin-top: 5px; font-weight: 500;">Welcome back! Your race data is synced.</p>
+                <p style="color: #cbd5e1; margin-top: 5px; font-weight: 500;">Events are automatically sorted by date.</p>
             </div>
             <div class="action-btns">
                 <button class="btn btn-new" onclick="addNewRow()">+ New Event</button>
@@ -117,30 +114,12 @@
             <table id="marathonTable">
                 <thead>
                     <tr>
-                        <th style="width: 20%;">
-                            <div class="header-content"><span class="header-icon">🏃‍♂️</span> Marathon Name</div>
-                            <div class="resizer"></div>
-                        </th>
-                        <th style="width: 15%;">
-                            <div class="header-content"><span class="header-icon">📏</span> Distance</div>
-                            <div class="resizer"></div>
-                        </th>
-                        <th style="width: 15%;">
-                            <div class="header-content"><span class="header-icon">📅</span> Date</div>
-                            <div class="resizer"></div>
-                        </th>
-                        <th style="width: 15%;">
-                            <div class="header-content"><span class="header-icon">⚡</span> Status</div>
-                            <div class="resizer"></div>
-                        </th>
-                        <th style="width: 15%;">
-                            <div class="header-content"><span class="header-icon">📍</span> Location</div>
-                            <div class="resizer"></div>
-                        </th>
-                        <th style="width: 15%;">
-                            <div class="header-content"><span class="header-icon">💰</span> Amount Paid</div>
-                            <div class="resizer"></div>
-                        </th>
+                        <th style="width: 20%;"><div class="header-content"><span class="header-icon">🏃‍♂️</span> Marathon Name</div><div class="resizer"></div></th>
+                        <th style="width: 15%;"><div class="header-content"><span class="header-icon">📏</span> Distance</div><div class="resizer"></div></th>
+                        <th style="width: 15%;"><div class="header-content"><span class="header-icon">📅</span> Date</div><div class="resizer"></div></th>
+                        <th style="width: 15%;"><div class="header-content"><span class="header-icon">⚡</span> Status</div><div class="resizer"></div></th>
+                        <th style="width: 15%;"><div class="header-content"><span class="header-icon">📍</span> Location</div><div class="resizer"></div></th>
+                        <th style="width: 15%;"><div class="header-content"><span class="header-icon">💰</span> Amount Paid</div><div class="resizer"></div></th>
                         <th style="width: 5%;">Del</th>
                     </tr>
                 </thead>
@@ -153,7 +132,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // --- CONFIG ---
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -179,6 +157,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             return 'status-yet';
         }
 
+        // Render function remains same
         function renderRow(id, item) {
             const tableBody = document.getElementById("tableBody");
             const row = document.createElement("tr");
@@ -197,36 +176,34 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                 </td>
                 <td><div class="editable" contenteditable="true" data-placeholder="City/State" onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
                 <td><input type="number" step="0.01" placeholder="0.00" value="${item.amount || ''}" onblur="updateDB('${id}', 'amount', this.value)"></td>
-                <td style="text-align:center;"><button style="color:#ef4444; background:none; border:none; cursor:pointer; font-size:1.2rem;" onclick="deleteFromDB('${id}')">×</button></td>
+                <td style="text-align:center;"><button style="color:#ef4444; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${id}')">×</button></td>
             `;
             tableBody.appendChild(row);
         }
 
-        // Draggable Column Logic
-        document.querySelectorAll('th').forEach(th => {
-            const resizer = th.querySelector('.resizer');
-            if (!resizer) return;
-            let startX, startWidth;
-            resizer.addEventListener('mousedown', e => {
-                startX = e.pageX;
-                startWidth = th.offsetWidth;
-                document.addEventListener('mousemove', mouseMoveHandler);
-                document.addEventListener('mouseup', mouseUpHandler);
-            });
-            const mouseMoveHandler = e => {
-                const width = startWidth + (e.pageX - startX);
-                th.style.width = `${width}px`;
-            };
-            const mouseUpHandler = () => {
-                document.removeEventListener('mousemove', mouseMoveHandler);
-                document.removeEventListener('mouseup', mouseUpHandler);
-            };
-        });
-
+        // LOAD DATA WITH SORTING
         function loadData() {
             db.ref('marathons').on('value', (s) => {
-                document.getElementById("tableBody").innerHTML = "";
-                if (s.val()) Object.keys(s.val()).forEach(k => renderRow(k, s.val()[k]));
+                const tableBody = document.getElementById("tableBody");
+                tableBody.innerHTML = "";
+                const data = s.val();
+                
+                if (data) {
+                    // Convert object to array for sorting
+                    const items = Object.keys(data).map(key => ({
+                        id: key,
+                        ...data[key]
+                    }));
+
+                    // Sort by Date Ascending
+                    items.sort((a, b) => {
+                        if (!a.date) return 1;
+                        if (!b.date) return -1;
+                        return new Date(a.date) - new Date(b.date);
+                    });
+
+                    items.forEach(item => renderRow(item.id, item));
+                }
             });
         }
 
