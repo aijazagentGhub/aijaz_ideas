@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Fixed Summary</title>
+    <title>Marathon Tracker - Yearly Summary</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,38 +17,44 @@
         }
 
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* --- SIDEBAR --- */
         .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
         .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; }
-        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
         .nav-link.active { background: #eff6ff; color: var(--primary-blue); }
 
+        /* --- MAIN PANE --- */
         .main-pane { flex-grow: 1; padding: 30px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
+        
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .header-row h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: var(--header-teal); }
 
+        /* --- STAT CARDS --- */
         .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
         .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
         .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; }
         .stat-card p { margin: 8px 0 0; font-size: 1.6rem; font-weight: 800; }
 
+        /* --- DATA TABLE --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8fafc; padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; color: #334155; font-size: 0.85rem; }
         td { padding: 12px; border: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9rem; font-weight: 600; }
         
-        .status-Completed select { color: var(--color-completed); }
-        .status-Pending select { color: var(--color-pending); }
-        .status-Missed select { color: var(--color-missed); }
+        /* Status Color Selectors */
+        .status-Completed select { color: var(--color-completed); font-weight: 800; }
+        .status-Pending select { color: var(--color-pending); font-weight: 800; }
+        .status-Missed select { color: var(--color-missed); font-weight: 800; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; color: inherit; font-weight: inherit; }
+        
         .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
         .btn-new { background: var(--primary-blue); color: white; }
         .btn-csv { background: var(--header-teal); color: white; margin-left: 8px; }
 
-        .yearly-box { max-width: 800px; }
-        .year-row { background-color: #f1f5f9; font-weight: 800; }
-        .month-row { background-color: #ffffff; color: #64748b; font-size: 0.85rem; }
-        .indent { padding-left: 30px !important; }
+        /* --- YEARLY TABLE --- */
+        .yearly-box { max-width: 700px; }
         .text-center { text-align: center; }
     </style>
 </head>
@@ -96,13 +102,13 @@
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr><th colspan="5" style="text-align: center; background: #e2e8f0;">Annual & Monthly Summary</th></tr>
+                        <tr><th colspan="5" style="text-align: center; background: #e2e8f0; font-size: 0.9rem;">Yearly Summary Breakdown</th></tr>
                         <tr>
-                            <th>Year / Month</th>
+                            <th>Year</th>
                             <th class="text-center">Comp.</th>
                             <th class="text-center">Pend.</th>
                             <th class="text-center">Miss.</th>
-                            <th class="text-center">Total ₹</th>
+                            <th class="text-center">Total Paid (₹)</th>
                         </tr>
                     </thead>
                     <tbody id="yearlyBody"></tbody>
@@ -115,7 +121,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // INSERT YOUR FIREBASE CONFIG HERE
+        // REPLACE WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -130,33 +136,26 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         function updateStats(items) {
             let comp = 0, pend = 0, miss = 0, total = 0;
-            let nestedData = {};
+            let yearlyData = {};
 
             items.forEach(item => {
-                // Normalize Status
                 const s = (item.status || 'Pending').toLowerCase();
                 const amt = parseFloat(item.amount) || 0;
 
+                // Counters
                 if (s === 'completed') comp++;
                 else if (s === 'missed') miss++;
                 else pend++;
                 total += amt;
 
-                // Nested Logic
-                if (item.date && item.date !== "") {
-                    const d = new Date(item.date);
-                    if (!isNaN(d.getTime())) {
-                        const y = d.getFullYear();
-                        const m = d.toLocaleString('default', { month: 'Long' });
-
-                        if (!nestedData[y]) nestedData[y] = { comp: 0, pend: 0, miss: 0, paid: 0, months: {} };
-                        if (!nestedData[y].months[m]) nestedData[y].months[m] = { comp: 0, pend: 0, miss: 0, paid: 0 };
-
+                // Yearly Grouping
+                if (item.date) {
+                    const year = new Date(item.date).getFullYear();
+                    if (!isNaN(year)) {
+                        if (!yearlyData[year]) yearlyData[year] = { comp: 0, pend: 0, miss: 0, paid: 0 };
                         const key = s === 'completed' ? 'comp' : (s === 'missed' ? 'miss' : 'pend');
-                        nestedData[y][key]++;
-                        nestedData[y].paid += amt;
-                        nestedData[y].months[m][key]++;
-                        nestedData[y].months[m].paid += amt;
+                        yearlyData[year][key]++;
+                        yearlyData[year].paid += amt;
                     }
                 }
             });
@@ -168,23 +167,16 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
             const yBody = document.getElementById('yearlyBody');
             yBody.innerHTML = "";
-            
-            Object.keys(nestedData).sort((a,b) => b-a).forEach(year => {
-                const yd = nestedData[year];
-                yBody.innerHTML += `<tr class="year-row">
-                    <td>📅 ${year}</td>
-                    <td class="text-center">${yd.comp}</td><td class="text-center">${yd.pend}</td>
-                    <td class="text-center">${yd.miss}</td><td class="text-center">₹${yd.paid.toLocaleString('en-IN')}</td>
-                </tr>`;
-
-                Object.keys(yd.months).forEach(month => {
-                    const md = yd.months[month];
-                    yBody.innerHTML += `<tr class="month-row">
-                        <td class="indent">└ ${month}</td>
-                        <td class="text-center">${md.comp}</td><td class="text-center">${md.pend}</td>
-                        <td class="text-center">${md.miss}</td><td class="text-center">₹${md.paid.toLocaleString('en-IN')}</td>
+            Object.keys(yearlyData).sort((a,b) => b-a).forEach(year => {
+                const yd = yearlyData[year];
+                yBody.innerHTML += `
+                    <tr>
+                        <td><strong>${year}</strong></td>
+                        <td class="text-center">${yd.comp}</td>
+                        <td class="text-center">${yd.pend}</td>
+                        <td class="text-center">${yd.miss}</td>
+                        <td class="text-center">₹${yd.paid.toLocaleString('en-IN')}</td>
                     </tr>`;
-                });
             });
         }
 
@@ -205,7 +197,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                 </td>
                 <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
                 <td><input type="number" step="0.01" value="${item.amount || ''}" onblur="updateDB('${id}', 'amount', this.value)"></td>
-                <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${id}')">×</button></td>
+                <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer; font-size:1.2rem;" onclick="deleteFromDB('${id}')">×</button></td>
             `;
             tableBody.appendChild(row);
         }
@@ -229,8 +221,8 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete?")) db.ref('marathons/' + id).remove(); }
-        function exportToCSV() { /* same as before */ }
+        function deleteFromDB(id) { if(confirm("Permanently delete this record?")) db.ref('marathons/' + id).remove(); }
+        function exportToCSV() { /* Logic for CSV Export */ }
 
         loadData();
     </script>
