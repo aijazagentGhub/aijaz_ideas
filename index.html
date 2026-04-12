@@ -8,13 +8,13 @@
     <style>
         :root {
             --sidebar-bg: #FFFFFF;
-            --main-bg: #F0F2F5; /* Standard gray backup */
+            --main-bg: #F0F2F5; 
             --primary-orange: #FF6B00;
             --text-dark: #2A3B4C;
             --text-light: #808D9A;
             --active-tab-bg: #FFEADF;
             --border-color: #cbd5e1;
-            --hover-beige: rgba(245, 245, 220, 0.9); /* Opaque hover for text clarity */
+            --hover-beige: rgba(245, 245, 220, 0.9); 
             --status-yellow: #fef9c3;
             --status-green: #dcfce7;
             --status-red: #fee2e2;
@@ -22,7 +22,7 @@
 
         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; color: var(--text-dark); overflow: hidden; }
 
-        /* --- SIDEBAR (Kept white for sharp menu) --- */
+        /* --- SIDEBAR --- */
         .sidebar { width: 260px; background-color: var(--sidebar-bg); height: 100vh; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; border-right: 2px solid var(--border-color); transition: all 0.3s ease; position: relative; z-index: 100; }
         body.collapsed .sidebar { width: 80px; padding: 25px 10px; }
         body.collapsed .brand-name, body.collapsed .nav-text { display: none; }
@@ -36,31 +36,30 @@
         .nav-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 15px; margin-bottom: 5px; }
         .nav-link.active { color: var(--primary-orange); background-color: var(--active-tab-bg); }
 
-        /* --- MAIN CONTENT (WITH DYNAMIC BACKGROUND) --- */
+        /* --- MAIN CONTENT --- */
         .main-pane { 
             flex-grow: 1; 
             padding: 40px; 
             box-sizing: border-box; 
             overflow-y: auto; 
             width: 100%;
-            /* SETS THE RUNNING GRAPHIC BACKGROUND */
-            background-image: url('background.png');
-            background-size: cover; /* Ensures image fills the entire pane */
-            background-position: center; /* Centers the running figures */
+            background-image: url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png');
+            background-size: cover; 
+            background-position: center; 
             background-repeat: no-repeat;
-            background-color: #008080; /* Teal backup color in case image fails */
+            background-color: #008080; 
         }
 
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header-row h1 { color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); } /* Enhanced title visibility on background */
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .user-greeting h1 { margin:0; font-weight:800; font-size:1.8rem; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); } 
         
         .btn { border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
         .btn-new { background-color: white; border: 1px solid var(--border-color); }
         .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; box-shadow: 0 4px 15px rgba(255,107,0,0.3); }
 
-        /* --- TABLE AREA (Semi-Transparent Card) --- */
+        /* --- TABLE AREA --- */
         .table-card { 
-            background-color: rgba(255, 255, 255, 0.92); /* Let background show through slightly */
+            background-color: rgba(255, 255, 255, 0.92); 
             padding: 25px; 
             border-radius: 20px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
@@ -68,20 +67,17 @@
             border: 1px solid var(--border-color); 
         }
         
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; } 
         th, td { border: 1px solid var(--border-color); padding: 12px 15px; position: relative; color: var(--text-dark); }
         th { background-color: #f8fafc; color: var(--text-light); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
         
-        /* Hover color over transparency */
         tr:hover td { background-color: var(--hover-beige) !important; }
 
-        /* Resizer Handle */
         .resizer { position: absolute; right: 0; top: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; }
         .resizer:hover { background: var(--primary-orange); }
 
         input, select, .editable { border: none; background: transparent; font-family: inherit; width: 100%; color: var(--text-dark); outline: none; }
         
-        /* Status Colors (Adjusted for light transparency background) */
         .status-select { font-weight: 700; border-radius: 4px; padding: 4px; border: 1px solid rgba(0,0,0,0.05); }
         .status-yet { background-color: var(--status-yellow); color: #854d0e; }
         .status-completed { background-color: var(--status-green); color: #166534; }
@@ -91,7 +87,7 @@
             .sidebar { position: fixed; left: -260px; height: 100%; }
             body.mobile-open .sidebar { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
             .toggle-btn { right: -40px; }
-            .main-pane { background-position: calc(50% + 130px) center; } /* Offset background on mobile toggle */
+            .main-pane { padding: 20px; } 
         }
     </style>
 </head>
@@ -113,8 +109,8 @@
     <div class="main-pane">
         <div class="header-row">
             <div class="user-greeting">
-                <h1 style="margin:0; font-weight:800; font-size:1.8rem;">AIJAZ MARATHON TRACKER</h1>
-                <p style="font-size: 0.8rem; color: #E0E7FF; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">Data is live and syncing to cloud</p>
+                <h1>AIJAZ MARATHON TRACKER</h1>
+                <p style="color:white; text-shadow: 1px 1px 2px black;">Live Cloud Sync Active</p>
             </div>
             <div class="action-btns">
                 <button class="btn btn-new" onclick="addNewRow()">+ New Event</button>
@@ -126,10 +122,11 @@
             <table id="marathonTable">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">Marathon Name <div class="resizer"></div></th>
+                        <th style="width: 20%;">Marathon Name <div class="resizer"></div></th>
+                        <th style="width: 15%;">Distance <div class="resizer"></div></th>
                         <th style="width: 15%;">Date <div class="resizer"></div></th>
-                        <th style="width: 20%;">Status <div class="resizer"></div></th>
-                        <th style="width: 20%;">Location <div class="resizer"></div></th>
+                        <th style="width: 15%;">Status <div class="resizer"></div></th>
+                        <th style="width: 15%;">Location <div class="resizer"></div></th>
                         <th style="width: 15%;">Amount Paid <div class="resizer"></div></th>
                         <th style="width: 5%;">Del</th>
                     </tr>
@@ -143,7 +140,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // --- YOUR CONFIG (PASTE AGAIN HERE) ---
+        // --- PASTE YOUR CONFIG HERE ---
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -163,7 +160,6 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             else body.classList.toggle('collapsed');
         }
 
-        // --- STATUS COLOR LOGIC ---
         function getStatusClass(val) {
             if (val === 'Completed') return 'status-completed';
             if (val === 'Missed') return 'status-missed';
@@ -176,8 +172,9 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             const sClass = getStatusClass(item.status);
 
             row.innerHTML = `
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'name', this.innerText)">${item.name}</div></td>
-                <td><input type="date" value="${item.date}" onchange="updateDB('${id}', 'date', this.value)"></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'name', this.innerText)">${item.name || ''}</div></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                <td><input type="date" value="${item.date || ''}" onchange="updateDB('${id}', 'date', this.value)"></td>
                 <td>
                     <select class="status-select ${sClass}" onchange="updateDB('${id}', 'status', this.value); this.className='status-select '+getStatusClass(this.value)">
                         <option value="Yet to happen" ${item.status === 'Yet to happen' ? 'selected' : ''}>Yet to happen</option>
@@ -185,38 +182,34 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                         <option value="Missed" ${item.status === 'Missed' ? 'selected' : ''}>Missed</option>
                     </select>
                 </td>
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'location', this.innerText)">${item.location}</div></td>
-                <td><input type="number" step="0.01" value="${item.amount}" onblur="updateDB('${id}', 'amount', this.value)"></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
+                <td><input type="number" step="0.01" value="${item.amount || 0}" onblur="updateDB('${id}', 'amount', this.value)"></td>
                 <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${id}')">×</button></td>
             `;
             tableBody.appendChild(row);
         }
 
-        // --- DRAGGABLE COLUMN LOGIC ---
+        // --- RESIZER SCRIPT ---
         document.querySelectorAll('th').forEach(th => {
             const resizer = th.querySelector('.resizer');
             if (!resizer) return;
             let startX, startWidth;
-
             resizer.addEventListener('mousedown', e => {
                 startX = e.pageX;
                 startWidth = th.offsetWidth;
                 document.addEventListener('mousemove', mouseMoveHandler);
                 document.addEventListener('mouseup', mouseUpHandler);
             });
-
             const mouseMoveHandler = e => {
                 const width = startWidth + (e.pageX - startX);
                 th.style.width = `${width}px`;
             };
-
             const mouseUpHandler = () => {
                 document.removeEventListener('mousemove', mouseMoveHandler);
                 document.removeEventListener('mouseup', mouseUpHandler);
             };
         });
 
-        // --- DATABASE LOGIC ---
         function loadData() {
             db.ref('marathons').on('value', (s) => {
                 document.getElementById("tableBody").innerHTML = "";
@@ -225,12 +218,24 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         }
 
         function addNewRow() {
-            db.ref('marathons').push({ name: "New Marathon Name", date: "2026-04-12", status: "Yet to happen", location: "Location", amount: 0.00 });
+            db.ref('marathons').push({ name: "New Race", distance: "42k", date: new Date().toISOString().split('T')[0], status: "Yet to happen", location: "City", amount: 0.00 });
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete this entry?")) db.ref('marathons/' + id).remove(); }
-        function exportToCSV() { /* ... export as before ... */ }
+        function deleteFromDB(id) { if(confirm("Delete this?")) db.ref('marathons/' + id).remove(); }
+        
+        function exportToCSV() {
+            db.ref('marathons').once('value', (snapshot) => {
+                const data = snapshot.val();
+                let csv = "data:text/csv;charset=utf-8,Name,Distance,Date,Status,Location,Amount\n";
+                if(data) {
+                    Object.values(data).forEach(v => {
+                        csv += `"${v.name}",${v.distance},${v.date},${v.status},"${v.location}",${v.amount}\n`;
+                    });
+                    window.open(encodeURI(csv));
+                }
+            });
+        }
 
         loadData();
     </script>
