@@ -8,8 +8,8 @@
     <style>
         :root {
             --primary-blue: #2563eb;
-            --ice-blue: #e0f2fe; /* Distinct Ice Blue for hover */
-            --row-alt: #f8fafc;   /* Smooth identifiable row color */
+            --ice-blue: #e0f2fe; /* Unified Ice Blue for Hover & Headings */
+            --row-alt: #f8fafc;   
             --border-color: #cbd5e1;
             --color-completed: #16a34a;
             --color-pending: #ca8a04;
@@ -37,12 +37,11 @@
         /* --- DATA TABLE --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; color: #334155; font-size: 0.85rem; }
         
-        /* Smooth Zebra Striping */
+        /* Updated Table Headings to Ice Blue */
+        th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; color: #1e293b; font-size: 0.85rem; }
+        
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
-        
-        /* ICE BLUE HOVER */
         tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
         
         td { padding: 12px; border: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9rem; font-weight: 600; }
@@ -61,7 +60,6 @@
         .pagination { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 30px; }
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .yearly-box { max-width: 700px; }
         .text-center { text-align: center; }
@@ -113,7 +111,7 @@
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr><th colspan="5" style="text-align: center; background: #e2e8f0; font-size: 0.9rem;">Yearly Summary (₹)</th></tr>
+                        <tr><th colspan="5" style="text-align: center; background: var(--ice-blue); color: #1e293b;">Yearly Summary Breakdown</th></tr>
                         <tr>
                             <th>Year</th>
                             <th class="text-center">Comp.</th>
@@ -132,6 +130,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
+        // REPLACE WITH YOUR CONFIG
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -175,7 +174,6 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             document.getElementById('stat-completed').innerText = comp;
             document.getElementById('stat-pending').innerText = pend;
             document.getElementById('stat-missed').innerText = miss;
-            // Rupee symbol removed from the dynamic number itself, kept in header
             document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
 
             const yBody = document.getElementById('yearlyBody');
@@ -188,7 +186,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                         <td class="text-center">${yd.comp}</td>
                         <td class="text-center">${yd.pend}</td>
                         <td class="text-center">${yd.miss}</td>
-                        <td class="text-center">${yd.paid.toLocaleString('en-IN')}</td>
+                        <td class="text-center">₹${yd.paid.toLocaleString('en-IN')}</td>
                     </tr>`;
             });
         }
@@ -196,7 +194,6 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         function renderTable() {
             const tableBody = document.getElementById("tableBody");
             tableBody.innerHTML = "";
-
             const start = (currentPage - 1) * rowsPerPage;
             const end = start + rowsPerPage;
             const paginatedItems = allItems.slice(start, end);
@@ -221,7 +218,6 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                 `;
                 tableBody.appendChild(row);
             });
-
             renderPagination();
         }
 
@@ -229,9 +225,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             const controls = document.getElementById("paginationControls");
             controls.innerHTML = "";
             const pageCount = Math.ceil(allItems.length / rowsPerPage);
-
             if (pageCount <= 1) return;
-
             for (let i = 1; i <= pageCount; i++) {
                 const btn = document.createElement("button");
                 btn.innerText = i;
@@ -250,9 +244,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                     updateStats(allItems);
                     renderTable();
                 } else {
-                    allItems = [];
-                    updateStats([]);
-                    renderTable();
+                    allItems = []; renderTable();
                 }
             });
         }
@@ -264,7 +256,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
         function deleteFromDB(id) { if(confirm("Delete record?")) db.ref('marathons/' + id).remove(); }
-        function exportToCSV() { /* Logic */ }
+        function exportToCSV() { /* Export logic */ }
 
         loadData();
     </script>
