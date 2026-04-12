@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Final Revision</title>
+    <title>Marathon Tracker - Responsive & Collapsible</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #2563eb;
             --ice-blue: #e0f2fe;
+            --alert-red: #dc2626;
             --row-alt: #f8fafc;   
             --border-color: #cbd5e1;
             --color-completed: #16a34a;
@@ -18,68 +19,83 @@
         }
 
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; }
-        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 12px; border-radius: 8px; display: block; background: #eff6ff; color: var(--primary-blue); }
 
-        .main-pane { flex-grow: 1; padding: 30px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
+        /* --- COLLAPSIBLE SIDEBAR --- */
+        .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s ease; position: relative; }
+        .sidebar.collapsed { width: 60px; padding: 20px 10px; }
+        .sidebar.collapsed .logo, .sidebar.collapsed .nav-text { display: none; }
         
-        /* --- DYNAMIC CENTERED BANNER --- */
-        @keyframes blinker {
-            50% { opacity: 0.1; }
-        }
-        .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 25px; }
+        .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; white-space: nowrap; }
+        .toggle-btn { position: absolute; top: 20px; right: -15px; background: var(--primary-blue); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 10; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .nav-link { text-decoration: none; color: var(--primary-blue); font-weight: 600; padding: 12px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; gap: 10px; }
+
+        /* --- MAIN CONTENT --- */
+        .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
+        
+        /* --- RED ALERT BANNER --- */
+        @keyframes blinker { 50% { opacity: 0.3; } }
+        .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; }
         .upcoming-banner { 
-            background: var(--ice-blue); 
-            color: #1e293b; 
-            padding: 12px 30px; 
-            border-radius: 50px; 
+            background: var(--alert-red); 
+            color: white; 
+            padding: 12px 25px; 
+            border-radius: 8px; 
             display: inline-block;
-            border: 2px solid var(--primary-blue);
+            border: 3px solid #991b1b;
             text-align: center;
-            font-weight: 700;
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
-            animation: blinker 0.6s linear 5; /* Blinks 5 times */
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            animation: blinker 0.5s linear 5;
         }
 
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .header-row h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: #334155; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .header-row h1 { margin: 0; font-size: 1.5rem; font-weight: 800; color: #334155; }
 
-        .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; }
-        .stat-card p { margin: 8px 0 0; font-size: 1.6rem; font-weight: 800; }
+        /* --- RESPONSIVE SUMMARY --- */
+        .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-card p { margin: 5px 0 0; font-size: 1.4rem; font-weight: 800; }
 
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; color: #1e293b; font-size: 0.85rem; }
+        /* --- TABLE SCROLLING --- */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: var(--ice-blue); padding: 12px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.8rem; }
+        td { padding: 10px; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
-        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
-        td { padding: 12px; border: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9rem; font-weight: 600; }
+        tbody tr:hover { background-color: var(--ice-blue) !important; }
+
+        input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
         
-        .status-Completed select { color: var(--color-completed); font-weight: 800; }
-        .status-Pending select { color: var(--color-pending); font-weight: 800; }
-        .status-Missed select { color: var(--color-missed); font-weight: 800; }
-
-        input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; color: inherit; font-weight: inherit; }
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn:hover { opacity: 0.9; }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
         .btn-new { background: var(--primary-blue); color: white; }
-        .btn-csv { background: var(--header-teal); color: white; margin-left: 10px; }
+        .btn-csv { background: var(--header-teal); color: white; }
 
-        .pagination { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 30px; }
-        .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
+        .pagination { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 30px; }
+        .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; border-radius: 4px; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        .yearly-box { max-width: 850px; }
-        .text-center { text-align: center; }
+        /* --- MOBILE SPECIFIC --- */
+        @media (max-width: 600px) {
+            .sidebar { display: none; } /* Hide sidebar on very small screens for better focus */
+            .main-pane { padding: 15px; }
+            .header-row h1 { font-size: 1.2rem; }
+            .stat-card p { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" onclick="toggleSidebar()">↔</button>
         <div class="logo">FLUXION</div>
-        <nav><a href="#" class="nav-link">🏃 Marathon Tracker</a></nav>
+        <nav>
+            <a href="#" class="nav-link">
+                <span>🏃</span>
+                <span class="nav-text">Marathon Tracker</span>
+            </a>
+        </nav>
     </div>
 
     <div class="main-pane">
@@ -91,30 +107,30 @@
 
         <div class="header-row">
             <h1>Marathon Tracker</h1>
-            <div>
-                <button class="btn btn-new" onclick="addNewRow()">+ Add Race</button>
-                <button class="btn btn-csv" onclick="exportToCSV()">Export CSV</button>
+            <div style="display: flex; gap: 5px;">
+                <button class="btn btn-new" onclick="addNewRow()">+ Add</button>
+                <button class="btn btn-csv" onclick="exportToCSV()">Export</button>
             </div>
         </div>
 
         <div class="summary-bar">
-            <div class="stat-card"><h3>Completed</h3><p id="stat-completed" style="color:var(--color-completed)">0</p></div>
-            <div class="stat-card"><h3>Pending</h3><p id="stat-pending" style="color:var(--color-pending)">0</p></div>
+            <div class="stat-card"><h3>Comp.</h3><p id="stat-completed" style="color:var(--color-completed)">0</p></div>
+            <div class="stat-card"><h3>Pend.</h3><p id="stat-pending" style="color:var(--color-pending)">0</p></div>
             <div class="stat-card"><h3>Missed</h3><p id="stat-missed" style="color:var(--color-missed)">0</p></div>
-            <div class="stat-card"><h3>Total Paid (₹)</h3><p id="stat-total-paid">0</p></div>
+            <div class="stat-card"><h3>Total ₹</h3><p id="stat-total-paid">0</p></div>
         </div>
 
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 25%;">Marathon Name</th>
-                        <th style="width: 12%;">Distance (KM)</th>
-                        <th style="width: 15%;">Date</th>
-                        <th style="width: 15%;">Status</th>
-                        <th style="width: 18%;">Location</th>
-                        <th style="width: 10%;">Paid (₹)</th>
-                        <th style="width: 5%; text-align: center;">Action</th>
+                        <th>Marathon Name</th>
+                        <th style="width: 100px;">Distance (KM)</th>
+                        <th style="width: 130px;">Date</th>
+                        <th style="width: 110px;">Status</th>
+                        <th>Location</th>
+                        <th style="width: 100px;">Paid (₹)</th>
+                        <th style="width: 40px; text-align: center;"></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -123,23 +139,16 @@
 
         <div class="pagination" id="paginationControls"></div>
 
-        <div class="yearly-box">
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr><th colspan="6" style="text-align: center;">Yearly Summary Breakdown</th></tr>
-                        <tr>
-                            <th>Year</th>
-                            <th class="text-center">Total Runs</th>
-                            <th class="text-center">Comp.</th>
-                            <th class="text-center">Pend.</th>
-                            <th class="text-center">Miss.</th>
-                            <th class="text-center">Total Paid (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="yearlyBody"></tbody>
-                </table>
-            </div>
+        <div class="table-container" style="max-width: 600px;">
+            <table>
+                <thead>
+                    <tr><th colspan="6" style="text-align: center;">Yearly Summary Breakdown</th></tr>
+                    <tr style="font-size: 0.75rem;">
+                        <th>Year</th><th>Runs</th><th>Comp.</th><th>Pend.</th><th>Miss.</th><th>Paid (₹)</th>
+                    </tr>
+                </thead>
+                <tbody id="yearlyBody"></tbody>
+            </table>
         </div>
     </div>
 
@@ -163,19 +172,18 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         let currentPage = 1;
         const rowsPerPage = 4;
 
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
         function updateStats(items) {
             let comp = 0, pend = 0, miss = 0, total = 0;
             let yearlyData = {};
-
             items.forEach(item => {
                 const s = (item.status || 'Pending').toLowerCase();
                 const amt = parseFloat(item.amount) || 0;
-
-                if (s === 'completed') comp++;
-                else if (s === 'missed') miss++;
-                else pend++;
+                if (s === 'completed') comp++; else if (s === 'missed') miss++; else pend++;
                 total += amt;
-
                 if (item.date) {
                     const year = new Date(item.date).getFullYear();
                     if (!isNaN(year)) {
@@ -187,44 +195,34 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                     }
                 }
             });
-
             document.getElementById('stat-completed').innerText = comp;
             document.getElementById('stat-pending').innerText = pend;
             document.getElementById('stat-missed').innerText = miss;
             document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
-
             const yBody = document.getElementById('yearlyBody');
             yBody.innerHTML = "";
             Object.keys(yearlyData).sort((a,b) => b-a).forEach(year => {
                 const yd = yearlyData[year];
-                yBody.innerHTML += `<tr><td><strong>${year}</strong></td><td class="text-center">${yd.count}</td><td class="text-center">${yd.comp}</td><td class="text-center">${yd.pend}</td><td class="text-center">${yd.miss}</td><td class="text-center">${yd.paid.toLocaleString('en-IN')}</td></tr>`;
+                yBody.innerHTML += `<tr><td>${year}</td><td>${yd.count}</td><td>${yd.comp}</td><td>${yd.pend}</td><td>${yd.miss}</td><td>${yd.paid.toLocaleString('en-IN')}</td></tr>`;
             });
         }
 
         function updateUpcomingBanner(items) {
             const today = new Date();
-            // Filter only Pending runs in the future
             const future = items.filter(i => i.date && new Date(i.date) >= today && (i.status || 'Pending') === 'Pending')
                                 .sort((a, b) => new Date(a.date) - new Date(b.date));
-            
             const banner = document.getElementById('upcomingBanner');
-            const content = document.getElementById('bannerContent');
-            
             if (future.length > 0) {
-                const race = future[0];
-                const raceDate = new Date(race.date).toLocaleDateString('en-GB'); // dd/mm/yyyy
-                content.innerText = `${raceDate}, ${race.name || "New Marathon"}`;
+                const d = new Date(future[0].date).toLocaleDateString('en-GB');
+                document.getElementById('bannerContent').innerText = `${d}, ${future[0].name || 'TBD'}`;
                 banner.style.display = 'inline-block';
-            } else {
-                banner.style.display = 'none';
-            }
+            } else { banner.style.display = 'none'; }
         }
 
         function renderTable() {
             const tableBody = document.getElementById("tableBody");
             tableBody.innerHTML = "";
             const paginated = allItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-
             paginated.forEach(item => {
                 const row = document.createElement("tr");
                 const status = item.status || 'Pending';
@@ -235,7 +233,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                     <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)"><option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option><option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option><option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option></select></td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
-                    <td class="text-center"><button style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;" onclick="deleteFromDB('${item.id}')">×</button></td>
+                    <td><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -260,7 +258,6 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                 const data = s.val();
                 if (data) {
                     allItems = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                    // Priority Sort: Pending (By Date) -> Others (By Date)
                     allItems.sort((a, b) => {
                         const sA = (a.status || 'Pending') === 'Pending' ? 0 : 1;
                         const sB = (b.status || 'Pending') === 'Pending' ? 0 : 1;
@@ -281,21 +278,14 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
         function deleteFromDB(id) { if(confirm("Delete?")) db.ref('marathons/' + id).remove(); }
-
+        
         function exportToCSV() {
-            let csv = "Name,Distance,Date,Status,Location,Paid\n";
-            allItems.forEach(i => {
-                csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}"\n`;
-            });
+            let csv = "Name,Distance,Date,Status,Location,Amount\n";
+            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'Marathon_Records.csv');
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            a.href = url; a.download = 'Marathons.csv'; a.click();
         }
 
         loadData();
