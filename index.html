@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz - Open Item/Ideas Dashboard</title>
+    <title>Aijaz - Strategy Board</title>
     <style>
-        /* Modern Dashboard Styling */
         :root {
             --primary-blue: #0ea5e9;
             --light-blue: #e0f2fe;
@@ -15,27 +14,54 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
 
+        /* NEW MENU STYLING */
+        .top-nav {
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            text-decoration: none;
+            color: #64748b;
+            padding: 8px 20px;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .nav-tab.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
         .dashboard-container {
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0 12px 12px 12px; /* Adjusted corner for tabs */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 1000px;
             padding: 30px;
+            border: 1px solid var(--border-color);
         }
 
-        /* Header Section */
         .header-row {
             display: flex;
             justify-content: space-between;
@@ -62,191 +88,69 @@
             display: inline-block;
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
         .btn {
             border: none;
             padding: 10px 18px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
             font-size: 0.9rem;
         }
 
-        .btn-export {
-            background-color: white;
-            color: #64748b;
-            border: 1px solid var(--border-color);
-        }
-        .btn-export:hover { background-color: #f1f5f9; }
+        .btn-new { background-color: var(--primary-blue); color: white; }
 
-        .btn-new {
-            background-color: var(--primary-blue);
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-new:hover { background-color: #0284c7; }
-
-        /* Modern Table Styling */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 10px; /* Space between rows */
-        }
-
-        th {
-            text-align: left;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            color: var(--primary-blue);
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            padding: 10px 15px;
-        }
-
-        td {
-            background-color: white;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px;
-        }
-
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        th { text-align: left; color: var(--primary-blue); font-size: 0.75rem; font-weight: 800; padding: 10px 15px; }
+        td { background-color: white; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 15px; }
         td:first-child { border-left: 1px solid var(--border-color); border-radius: 8px 0 0 8px; }
         td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 8px 8px 0; }
 
-        /* Input and Controls */
-        input[type="date"], select {
-            border: 1px solid var(--border-color);
-            padding: 8px;
-            border-radius: 6px;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            width: 100%;
-            box-sizing: border-box;
-            background-color: white;
-        }
-
-        select {
-            appearance: none;
-            color: var(--primary-blue);
-            text-transform: uppercase;
-            font-weight: 700;
-            font-size: 0.8rem;
-            border: none;
-            background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%230ea5e9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>') no-repeat right 5px center;
-            padding-right: 20px;
-            cursor: pointer;
-        }
-
-        .task-cell {
-            color: #1e293b;
-            font-size: 0.95rem;
-            max-width: 400px;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .pagination-link {
-            color: var(--primary-blue);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .pagination-link.disabled { color: #cbd5e1; cursor: not-allowed; }
-
+        input[type="date"], select { border: none; font-family: inherit; font-size: 0.9rem; color: var(--text-main); width: 100%; }
+        select { color: var(--primary-blue); font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="dashboard-container">
-    
-    <div class="header-row">
-        <div class="title-group">
-            <h1>Aijaz - Open Item/Ideas</h1>
-            <span class="entry-count">4 Entries</span>
-        </div>
-        <div class="action-buttons">
-            <button class="btn btn-export">Export</button>
-            <button class="btn btn-new">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                New Entry
-            </button>
-        </div>
+    <div class="top-nav">
+        <a href="index.html" class="nav-tab active">Strategy Board</a>
+        <a href="about.html" class="nav-tab">About</a>
+        <a href="contact.html" class="nav-tab">Contact</a>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 15%;">Entry Date</th>
-                <th style="width: 65%;">Task Description</th>
-                <th style="width: 20%;">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="date" value="2026-04-11"></td>
-                <td class="task-cell">Create web page for marathon tracking.. which should have booked not booked and upcoming run s</td>
-                <td>
-                    <select>
-                        <option value="pending" selected>Pending</option>
-                        <option value="done">Done</option>
-                        <option value="archived">Archived</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="date" value="2026-04-09"></td>
-                <td class="task-cell">The Asian bank- read and folow</td>
-                <td>
-                    <select>
-                        <option value="pending" selected>Pending</option>
-                        <option value="done">Done</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="date" value="2026-04-09"></td>
-                <td class="task-cell">Register in Bain.com</td>
-                <td>
-                    <select>
-                        <option value="pending" selected>Pending</option>
-                        <option value="done">Done</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="date" value="2026-04-02"></td>
-                <td class="task-cell">Read about SLM</td>
-                <td>
-                    <select>
-                        <option value="pending" selected>Pending</option>
-                        <option value="done">Done</option>
-                    </select>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="dashboard-container">
+        
+        <div class="header-row">
+            <div class="title-group">
+                <h1>Aijaz - Open Item/Ideas</h1>
+                <span class="entry-count">4 Entries</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-new">+ New Entry</button>
+            </div>
+        </div>
 
-    <div class="pagination">
-        <a href="#" class="pagination-link disabled">← Previous</a>
-        <span>Page 1 of 4</span>
-        <a href="#" class="pagination-link">Next →</a>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Entry Date</th>
+                    <th style="width: 60%;">Task Description</th>
+                    <th style="width: 20%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="date" value="2026-04-11"></td>
+                    <td>Create web page for marathon tracking...</td>
+                    <td><select><option selected>PENDING</option><option>DONE</option></select></td>
+                </tr>
+                <tr>
+                    <td><input type="date" value="2026-04-09"></td>
+                    <td>The Asian bank- read and folow</td>
+                    <td><select><option selected>PENDING</option><option>DONE</option></select></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-</div>
 
 </body>
 </html>
