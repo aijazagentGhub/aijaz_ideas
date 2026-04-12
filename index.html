@@ -3,167 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fluxion - Aijaz Strategy Board</title>
+    <title>Aijaz - Marathon Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Modern Fluxion Dashboard Styling */
         :root {
             --sidebar-bg: #FFFFFF;
-            --main-bg: #F0F2F5; /* Matches the light gray from the design */
-            --primary-orange: #FF6B00; /* Matches the Generate Report button */
+            --main-bg: #F0F2F5;
+            --primary-orange: #FF6B00;
             --text-dark: #2A3B4C;
             --text-light: #808D9A;
-            --active-tab-bg: #FFEADF; /* Pale orange for active state */
+            --active-tab-bg: #FFEADF;
             --border-color: #E2E8F0;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            background-color: var(--main-bg);
-            color: var(--text-dark);
-            overflow: hidden; /* Important for fixed layout */
-        }
+        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; background-color: var(--main-bg); color: var(--text-dark); overflow: hidden; }
 
-        /* --- SIDEBAR NAVIGATION (LEFT TABS) --- */
-        .sidebar {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            box-sizing: border-box;
-            border-right: 1px solid var(--border-color);
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 50px;
-        }
-
-        .logo-icon {
-            width: 25px; height: 25px;
-            background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%);
-            border-radius: 6px;
-        }
-
+        /* SIDEBAR */
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); height: 100vh; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; border-right: 1px solid var(--border-color); }
+        .logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 50px; }
+        .logo-icon { width: 25px; height: 25px; background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); border-radius: 6px; }
         .brand-name { font-weight: 800; font-size: 1.2rem; color: var(--primary-orange); }
+        .nav-links { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
+        .nav-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 15px; }
+        .nav-link.active { color: var(--primary-orange); background-color: var(--active-tab-bg); }
 
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            flex-grow: 1;
-        }
+        /* MAIN CONTENT */
+        .main-pane { flex-grow: 1; padding: 40px; box-sizing: border-box; overflow-y: auto; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .user-greeting h1 { margin: 0; font-weight: 800; font-size: 1.8rem; }
+        .user-greeting p { margin: 5px 0 0; color: var(--text-light); font-size: 0.9rem; text-transform: uppercase; }
 
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-light);
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 12px 18px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.2s ease;
-        }
+        .btn { border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+        .btn-new { background-color: white; border: 1px solid var(--border-color); }
+        .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); }
 
-        .nav-link:hover { color: var(--text-dark); background-color: #F7FAFC; }
-
-        /* ACTIVE TAB STATE (matches design) */
-        .nav-link.active {
-            color: var(--primary-orange);
-            background-color: var(--active-tab-bg);
-        }
-
-        /* Nav Icons placeholder */
-        .nav-icon { width: 20px; text-align: center; }
-
-        /* --- MAIN CONTENT AREA (RIGHT) --- */
-        .main-pane {
-            flex-grow: 1;
-            padding: 40px;
-            box-sizing: border-box;
-            overflow-y: auto; /* Content scrollable */
-        }
-
-        /* Header Row (Hello + Actions) */
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .user-greeting h1 { margin: 0; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.5px; }
-        .user-greeting p { margin: 5px 0 0; color: var(--text-light); font-size: 0.9rem; }
-
-        .action-btns {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn {
-            border: none;
-            padding: 12px 25px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-new {
-            background-color: var(--sidebar-bg);
-            color: var(--text-dark);
-            border: 1px solid var(--border-color);
-        }
-        .btn-new:hover { background-color: #F7FAFC; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-
-        .btn-report {
-            background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
-        }
-        .btn-report:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4); }
-
-        /* --- YOUR TABLE DATA PANE --- */
-        .table-card {
-            background-color: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-            border: 1px solid rgba(0,0,0,0.02);
-        }
-
-        .table-card h2 { margin-top: 0; font-weight: 800; font-size: 1.2rem; margin-bottom: 25px; }
-
+        /* TABLE CARD */
+        .table-card { background-color: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
         table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
-        th { text-align: left; color: var(--text-light); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 15px; }
-        td { background-color: #F8FAFC; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 18px; font-size: 0.95rem; }
+        th { text-align: left; color: var(--text-light); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 10px 15px; }
+        td { background-color: #F8FAFC; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 15px; }
         td:first-child { border-left: 1px solid var(--border-color); border-radius: 12px 0 0 12px; }
-        td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 12px 12px 0; }
+        td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 12px 12px 12px; }
 
-        input[type="date"], select, .editable-text { border: none; font-family: inherit; width: 100%; padding: 5px; color: var(--text-dark); background: transparent; }
-        .editable-text:focus { outline: none; border-bottom: 2px solid var(--primary-orange); }
+        input, select, .editable { border: none; background: transparent; font-family: inherit; font-size: 0.9rem; width: 100%; color: var(--text-dark); }
+        input:focus { outline: none; border-bottom: 1px solid var(--primary-orange); }
         select { color: var(--primary-orange); font-weight: 700; cursor: pointer; }
         
-        .btn-delete { background: none; border: none; color: #ef4444; font-size: 1.2rem; cursor: pointer; padding: 0 10px; opacity: 0.5; }
-        .btn-delete:hover { opacity: 1; }
-
-        /* Pagination area */
+        /* Pagination */
         .pagination-area { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); }
-        .page-info { font-size: 0.85rem; color: var(--text-light); }
-        .pg-btn { background: white; border: 1px solid var(--border-color); padding: 6px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--primary-orange); }
-        .pg-btn:disabled { color: var(--text-light); cursor: not-allowed; opacity: 0.5; }
-
+        .pg-btn { background: white; border: 1px solid var(--border-color); padding: 6px 15px; border-radius: 8px; cursor: pointer; color: var(--primary-orange); font-weight: 600; }
+        .pg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -173,49 +62,35 @@
             <div class="logo-icon"></div>
             <div class="brand-name">Fluxion</div>
         </div>
-
         <nav class="nav-links">
-            <a href="index.html" class="nav-link active">
-                <span class="nav-icon">📅</span> Strategy Board
-            </a>
-            <a href="about.html" class="nav-link">
-                <span class="nav-icon">📖</span> Library
-            </a>
-            <a href="contact.html" class="nav-link">
-                <span class="nav-icon">📊</span> Workouts
-            </a>
-            <a href="#" class="nav-link"><span class="nav-icon">📅</span> Subscription</a>
-            <a href="#" class="nav-link"><span class="nav-icon">📊</span> Reports</a>
+            <a href="index.html" class="nav-link active">🏃‍♂️ Marathon Schedule</a>
+            <a href="about.html" class="nav-link">📖 Library</a>
+            <a href="contact.html" class="nav-link">📊 Workouts</a>
         </nav>
-        
-        <a href="#" class="nav-link" style="margin-top: auto;">
-            <span class="nav-icon">👤</span> Account
-        </a>
     </div>
 
     <div class="main-pane">
-        
         <div class="header-row">
             <div class="user-greeting">
-                <h1>HELLO AIJAZ,</h1>
-                <p>GOOD MORNING</p>
+                <h1>AIJAZ MARATHON SCHEDULE/STATUS</h1>
+                <p>Track your runs and payments</p>
             </div>
             <div class="action-btns">
-                <button class="btn btn-new" onclick="addNewRow()">+ New Entry</button>
-                <button class="btn btn-report" onclick="exportToCSV()">Generate Report</button>
+                <button class="btn btn-new" onclick="addNewRow()">+ New Marathon</button>
+                <button class="btn btn-report" onclick="exportToCSV()">Export CSV</button>
             </div>
         </div>
 
         <div class="table-card">
-            <h2>OPEN ITEM/IDEAS TRACKER</h2>
-            
-            <table id="taskTable">
+            <table id="marathonTable">
                 <thead>
                     <tr>
-                        <th style="width: 18%;">Entry Date</th>
-                        <th style="width: 50%;">Task Description</th>
-                        <th style="width: 18%;">Status</th>
-                        <th style="width: 4%;"></th>
+                        <th style="width: 25%;">Marathon Name</th>
+                        <th style="width: 15%;">Date of Run</th>
+                        <th style="width: 20%;">Status</th>
+                        <th style="width: 20%;">Location</th>
+                        <th style="width: 15%;">Amount Paid</th>
+                        <th style="width: 5%;"></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -224,66 +99,69 @@
 
             <div class="pagination-area">
                 <button class="pg-btn" id="prevBtn" onclick="changePage(-1)">← Previous</button>
-                <span class="page-info" id="pageInfo">Page 1 of 1</span>
+                <span id="pageInfo" style="font-size: 0.8rem; color: #808D9A;">Page 1 of 1</span>
                 <button class="pg-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
             </div>
         </div>
-
     </div>
 
     <script>
-        /* BRAIN/FUNCTIONALITY (Kept simple for non-technical user) */
         let currentPage = 1;
         const rowsPerPage = 6;
 
         function addNewRow() {
             const tableBody = document.getElementById("tableBody");
             const row = document.createElement("tr");
-            const today = new Date().toISOString().split('T')[0];
-
+            
             row.innerHTML = `
-                <td><input type="date" value="${today}"></td>
-                <td><div class="editable-text" contenteditable="true">New task description...</div></td>
-                <td><select><option selected>PENDING</option><option>DONE</option></select></td>
-                <td><button class="btn-delete" onclick="deleteRow(this)">×</button></td>
+                <td><div class="editable" contenteditable="true" placeholder="Enter name...">New Marathon</div></td>
+                <td><input type="date" value="${new Date().toISOString().split('T')[0]}"></td>
+                <td>
+                    <select>
+                        <option>Yet to happen</option>
+                        <option>Completed</option>
+                        <option>Missed</option>
+                    </select>
+                </td>
+                <td><div class="editable" contenteditable="true">City, Country</div></td>
+                <td><input type="number" step="0.01" value="0.00" style="font-weight:bold;"></td>
+                <td><button style="border:none; background:none; color:red; cursor:pointer;" onclick="this.closest('tr').remove(); updatePagination();">×</button></td>
             `;
             
             tableBody.prepend(row);
             updatePagination();
         }
 
-        function deleteRow(btn) { btn.closest('tr').remove(); updatePagination(); }
-
         function updatePagination() {
             const rows = document.getElementById("tableBody").rows;
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+            const totalPages = Math.ceil(rows.length / rowsPerPage) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
-            for (let i = 0; i < totalRows; i++) {
-                const start = (currentPage - 1) * rowsPerPage;
-                rows[i].style.display = (i >= start && i < start + rowsPerPage) ? "" : "none";
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].style.display = (i >= (currentPage-1)*rowsPerPage && i < currentPage*rowsPerPage) ? "" : "none";
             }
             document.getElementById("pageInfo").innerText = `Page ${currentPage} of ${totalPages}`;
             document.getElementById("prevBtn").disabled = currentPage === 1;
-            document.getElementById("nextBtn").disabled = currentPage === totalPages || totalRows === 0;
+            document.getElementById("nextBtn").disabled = currentPage === totalPages || rows.length === 0;
         }
 
         function changePage(dir) { currentPage += dir; updatePagination(); }
 
         function exportToCSV() {
             const rows = document.querySelectorAll("#tableBody tr");
-            let csv = "data:text/csv;charset=utf-8,Date,Description,Status\n";
+            let csv = "data:text/csv;charset=utf-8,Marathon,Date,Status,Location,Amount\n";
             rows.forEach(r => {
+                const name = r.cells[0].innerText;
                 const date = r.querySelector('input[type="date"]').value;
-                const desc = r.querySelector('.editable-text').innerText.replace(/,/g, ""); 
-                const stat = r.querySelector('select').value;
-                csv += `${date},${desc},${stat}\n`;
+                const status = r.querySelector('select').value;
+                const loc = r.cells[3].innerText;
+                const amt = r.querySelector('input[type="number"]').value;
+                csv += `"${name}",${date},${status},"${loc}",${amt}\n`;
             });
             window.open(encodeURI(csv));
         }
 
-        // Initialize with sample rows
-        for(let i=0; i<4; i++) { addNewRow(); }
+        // Load 2 sample rows
+        for(let i=0; i<2; i++) { addNewRow(); }
     </script>
 </body>
 </html>
