@@ -13,38 +13,19 @@
             --border-color: #e2e8f0;
         }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         .top-nav { width: 100%; max-width: 1000px; margin-bottom: 15px; display: flex; gap: 10px; }
         .nav-tab { text-decoration: none; color: #64748b; padding: 8px 20px; background: white; border-radius: 8px 8px 0 0; font-weight: 600; font-size: 0.9rem; border: 1px solid var(--border-color); border-bottom: none; }
         .nav-tab.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
 
-        .dashboard-container {
-            background-color: white;
-            border-radius: 0 12px 12px 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 1000px;
-            padding: 30px;
-            border: 1px solid var(--border-color);
-        }
-
+        .dashboard-container { background-color: white; border-radius: 0 12px 12px 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); width: 100%; max-width: 1000px; padding: 30px; border: 1px solid var(--border-color); box-sizing: border-box; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .title-group h1 { color: var(--primary-blue); text-transform: uppercase; font-weight: 800; font-size: 1.5rem; margin: 0; }
         
+        .action-group { display: flex; gap: 10px; }
         .btn { border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
         .btn-new { background-color: var(--primary-blue); color: white; }
-        .btn-new:hover { background-color: #0284c7; }
+        .btn-export { background-color: white; color: #64748b; border: 1px solid var(--border-color); }
         .btn-delete { background: none; color: #ef4444; font-size: 1.2rem; padding: 0 10px; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
@@ -53,16 +34,14 @@
         td:first-child { border-left: 1px solid var(--border-color); border-radius: 8px 0 0 8px; }
         td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 8px 8px 0; }
 
-        input[type="date"], select, .editable-text { 
-            border: 1px solid transparent; 
-            font-family: inherit; 
-            font-size: 0.95rem; 
-            width: 100%; 
-            padding: 5px;
-            border-radius: 4px;
-        }
-        .editable-text:focus, input:focus { border-color: var(--light-blue); outline: none; background: #fafafa; }
-        select { color: var(--primary-blue); font-weight: 700; cursor: pointer; appearance: none; }
+        input[type="date"], select, .editable-text { border: 1px solid transparent; font-family: inherit; font-size: 0.95rem; width: 100%; padding: 5px; border-radius: 4px; }
+        .editable-text:focus { border-color: var(--light-blue); outline: none; background: #fafafa; }
+        select { color: var(--primary-blue); font-weight: 700; cursor: pointer; background: transparent; appearance: none; }
+
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .page-info { font-size: 0.9rem; color: #94a3b8; }
+        .pg-btn { background: white; border: 1px solid var(--border-color); padding: 5px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; color: var(--primary-blue); }
+        .pg-btn:disabled { color: #cbd5e1; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -78,7 +57,10 @@
             <div class="title-group">
                 <h1>Aijaz - Open Item/Ideas</h1>
             </div>
-            <button class="btn btn-new" onclick="addNewRow()">+ New Entry</button>
+            <div class="action-group">
+                <button class="btn btn-export" onclick="exportToCSV()">Export</button>
+                <button class="btn btn-new" onclick="addNewRow()">+ New Entry</button>
+            </div>
         </div>
 
         <table id="taskTable">
@@ -90,43 +72,87 @@
                     <th style="width: 5%;"></th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><input type="date" value="2026-04-12"></td>
-                    <td><div class="editable-text" contenteditable="true">Click here to edit this task...</div></td>
-                    <td><select><option selected>PENDING</option><option>DONE</option></select></td>
-                    <td><button class="btn btn-delete" onclick="deleteRow(this)">×</button></td>
-                </tr>
-            </tbody>
+            <tbody id="tableBody">
+                </tbody>
         </table>
+
+        <div class="pagination-controls">
+            <button class="pg-btn" id="prevBtn" onclick="changePage(-1)">← Previous</button>
+            <span class="page-info" id="pageInfo">Page 1 of 1</span>
+            <button class="pg-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+        </div>
     </div>
 
     <script>
-        // THIS IS THE "BRAIN" THAT MAKES BUTTONS WORK
+        let currentPage = 1;
+        const rowsPerPage = 6;
+
         function addNewRow() {
-            const table = document.getElementById("taskTable").getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            
-            // Get today's date automatically
+            const tableBody = document.getElementById("tableBody");
+            const row = document.createElement("tr");
             const today = new Date().toISOString().split('T')[0];
 
-            newRow.innerHTML = `
+            row.innerHTML = `
                 <td><input type="date" value="${today}"></td>
-                <td><div class="editable-text" contenteditable="true">New Task Description...</div></td>
-                <td>
-                    <select>
-                        <option selected>PENDING</option>
-                        <option>DONE</option>
-                    </select>
-                </td>
+                <td><div class="editable-text" contenteditable="true">New task description...</div></td>
+                <td><select><option selected>PENDING</option><option>DONE</option></select></td>
                 <td><button class="btn btn-delete" onclick="deleteRow(this)">×</button></td>
             `;
+            
+            tableBody.prepend(row);
+            updatePagination();
         }
 
         function deleteRow(btn) {
-            const row = btn.parentNode.parentNode;
-            row.parentNode.removeChild(row);
+            btn.closest('tr').remove();
+            updatePagination();
         }
+
+        function updatePagination() {
+            const rows = document.getElementById("tableBody").rows;
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            for (let i = 0; i < totalRows; i++) {
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                rows[i].style.display = (i >= start && i < end) ? "" : "none";
+            }
+
+            document.getElementById("pageInfo").innerText = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById("prevBtn").disabled = currentPage === 1;
+            document.getElementById("nextBtn").disabled = (currentPage === totalPages || totalRows === 0);
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            updatePagination();
+        }
+
+        function exportToCSV() {
+            const rows = document.querySelectorAll("#tableBody tr");
+            let csvContent = "data:text/csv;charset=utf-8,Date,Description,Status\n";
+
+            rows.forEach(row => {
+                const date = row.querySelector('input[type="date"]').value;
+                const desc = row.querySelector('.editable-text').innerText.replace(/,/g, ""); // Remove commas so CSV doesn't break
+                const status = row.querySelector('select').value;
+                csvContent += `${date},${desc},${status}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "aijaz_strategy_board.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize with 4 sample rows
+        for(let i=0; i<4; i++) { addNewRow(); }
     </script>
 
 </body>
