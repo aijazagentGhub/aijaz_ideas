@@ -25,36 +25,13 @@
             min-height: 100vh;
         }
 
-        /* NEW MENU STYLING */
-        .top-nav {
-            width: 100%;
-            max-width: 1000px;
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .nav-tab {
-            text-decoration: none;
-            color: #64748b;
-            padding: 8px 20px;
-            background: white;
-            border-radius: 8px 8px 0 0;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: 1px solid var(--border-color);
-            border-bottom: none;
-        }
-
-        .nav-tab.active {
-            background: var(--primary-blue);
-            color: white;
-            border-color: var(--primary-blue);
-        }
+        .top-nav { width: 100%; max-width: 1000px; margin-bottom: 15px; display: flex; gap: 10px; }
+        .nav-tab { text-decoration: none; color: #64748b; padding: 8px 20px; background: white; border-radius: 8px 8px 0 0; font-weight: 600; font-size: 0.9rem; border: 1px solid var(--border-color); border-bottom: none; }
+        .nav-tab.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
 
         .dashboard-container {
             background-color: white;
-            border-radius: 0 12px 12px 12px; /* Adjusted corner for tabs */
+            border-radius: 0 12px 12px 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 1000px;
@@ -62,42 +39,13 @@
             border: 1px solid var(--border-color);
         }
 
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .title-group h1 {
-            color: var(--primary-blue);
-            text-transform: uppercase;
-            font-weight: 800;
-            font-size: 1.5rem;
-            margin: 0;
-        }
-
-        .title-group .entry-count {
-            color: var(--primary-blue);
-            background-color: var(--light-blue);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-top: 5px;
-            display: inline-block;
-        }
-
-        .btn {
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .title-group h1 { color: var(--primary-blue); text-transform: uppercase; font-weight: 800; font-size: 1.5rem; margin: 0; }
+        
+        .btn { border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
         .btn-new { background-color: var(--primary-blue); color: white; }
+        .btn-new:hover { background-color: #0284c7; }
+        .btn-delete { background: none; color: #ef4444; font-size: 1.2rem; padding: 0 10px; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
         th { text-align: left; color: var(--primary-blue); font-size: 0.75rem; font-weight: 800; padding: 10px 15px; }
@@ -105,8 +53,16 @@
         td:first-child { border-left: 1px solid var(--border-color); border-radius: 8px 0 0 8px; }
         td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 8px 8px 0; }
 
-        input[type="date"], select { border: none; font-family: inherit; font-size: 0.9rem; color: var(--text-main); width: 100%; }
-        select { color: var(--primary-blue); font-weight: 700; cursor: pointer; }
+        input[type="date"], select, .editable-text { 
+            border: 1px solid transparent; 
+            font-family: inherit; 
+            font-size: 0.95rem; 
+            width: 100%; 
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .editable-text:focus, input:focus { border-color: var(--light-blue); outline: none; background: #fafafa; }
+        select { color: var(--primary-blue); font-weight: 700; cursor: pointer; appearance: none; }
     </style>
 </head>
 <body>
@@ -118,39 +74,60 @@
     </div>
 
     <div class="dashboard-container">
-        
         <div class="header-row">
             <div class="title-group">
                 <h1>Aijaz - Open Item/Ideas</h1>
-                <span class="entry-count">4 Entries</span>
             </div>
-            <div class="action-buttons">
-                <button class="btn btn-new">+ New Entry</button>
-            </div>
+            <button class="btn btn-new" onclick="addNewRow()">+ New Entry</button>
         </div>
 
-        <table>
+        <table id="taskTable">
             <thead>
                 <tr>
                     <th style="width: 20%;">Entry Date</th>
-                    <th style="width: 60%;">Task Description</th>
+                    <th style="width: 55%;">Task Description</th>
                     <th style="width: 20%;">Status</th>
+                    <th style="width: 5%;"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><input type="date" value="2026-04-11"></td>
-                    <td>Create web page for marathon tracking...</td>
+                    <td><input type="date" value="2026-04-12"></td>
+                    <td><div class="editable-text" contenteditable="true">Click here to edit this task...</div></td>
                     <td><select><option selected>PENDING</option><option>DONE</option></select></td>
-                </tr>
-                <tr>
-                    <td><input type="date" value="2026-04-09"></td>
-                    <td>The Asian bank- read and folow</td>
-                    <td><select><option selected>PENDING</option><option>DONE</option></select></td>
+                    <td><button class="btn btn-delete" onclick="deleteRow(this)">×</button></td>
                 </tr>
             </tbody>
         </table>
     </div>
+
+    <script>
+        // THIS IS THE "BRAIN" THAT MAKES BUTTONS WORK
+        function addNewRow() {
+            const table = document.getElementById("taskTable").getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            
+            // Get today's date automatically
+            const today = new Date().toISOString().split('T')[0];
+
+            newRow.innerHTML = `
+                <td><input type="date" value="${today}"></td>
+                <td><div class="editable-text" contenteditable="true">New Task Description...</div></td>
+                <td>
+                    <select>
+                        <option selected>PENDING</option>
+                        <option>DONE</option>
+                    </select>
+                </td>
+                <td><button class="btn btn-delete" onclick="deleteRow(this)">×</button></td>
+            `;
+        }
+
+        function deleteRow(btn) {
+            const row = btn.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+    </script>
 
 </body>
 </html>
