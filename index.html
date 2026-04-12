@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz - Marathon Live Tracker</title>
+    <title>Aijaz - Marathon Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,38 +16,51 @@
             --border-color: #E2E8F0;
         }
 
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; background-color: var(--main-bg); color: var(--text-dark); overflow: hidden; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; background-color: var(--main-bg); color: var(--text-dark); }
 
-        /* SIDEBAR */
-        .sidebar { width: 260px; background-color: var(--sidebar-bg); height: 100vh; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; border-right: 1px solid var(--border-color); }
+        /* --- SIDEBAR (Desktop) --- */
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); min-height: 100vh; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; border-right: 1px solid var(--border-color); flex-shrink: 0; }
         .logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 50px; }
         .logo-icon { width: 25px; height: 25px; background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); border-radius: 6px; }
         .brand-name { font-weight: 800; font-size: 1.2rem; color: var(--primary-orange); }
         .nav-links { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
-        .nav-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 15px; }
+        .nav-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 15px; white-space: nowrap; }
         .nav-link.active { color: var(--primary-orange); background-color: var(--active-tab-bg); }
 
-        /* MAIN CONTENT */
-        .main-pane { flex-grow: 1; padding: 40px; box-sizing: border-box; overflow-y: auto; }
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .user-greeting h1 { margin: 0; font-weight: 800; font-size: 1.8rem; }
+        /* --- MAIN CONTENT --- */
+        .main-pane { flex-grow: 1; padding: 40px; box-sizing: border-box; width: 100%; overflow-x: hidden; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .user-greeting h1 { margin: 0; font-weight: 800; font-size: 1.8rem; line-height: 1.2; }
         
-        .btn { border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+        .action-btns { display: flex; gap: 10px; }
+        .btn { border: none; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.85rem; white-space: nowrap; }
         .btn-new { background-color: white; border: 1px solid var(--border-color); }
         .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; }
 
-        /* TABLE CARD */
-        .table-card { background-color: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        /* --- TABLE AREA --- */
+        .table-card { background-color: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; min-width: 700px; } /* Ensures table doesn't crush on mobile */
         th { text-align: left; color: var(--text-light); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 10px 15px; }
         td { background-color: #F8FAFC; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 15px; }
         td:first-child { border-left: 1px solid var(--border-color); border-radius: 12px 0 0 12px; }
         td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 12px 12px 12px; }
 
         input, select, .editable { border: none; background: transparent; font-family: inherit; font-size: 0.9rem; width: 100%; color: var(--text-dark); }
-        input:focus { outline: none; border-bottom: 1px solid var(--primary-orange); }
-        select { color: var(--primary-orange); font-weight: 700; cursor: pointer; }
         
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; min-height: auto; border-right: none; border-bottom: 1px solid var(--border-color); padding: 15px; }
+            .logo-area { margin-bottom: 15px; }
+            .nav-links { flex-direction: row; overflow-x: auto; padding-bottom: 5px; }
+            .nav-link { padding: 8px 15px; }
+            
+            .main-pane { padding: 20px; }
+            .header-row { flex-direction: column; align-items: flex-start; }
+            .action-btns { width: 100%; }
+            .btn { flex: 1; text-align: center; }
+        }
+
         .save-indicator { font-size: 0.8rem; color: #10b981; margin-top: 10px; display: none; }
     </style>
 </head>
@@ -59,7 +72,7 @@
             <div class="brand-name">Fluxion</div>
         </div>
         <nav class="nav-links">
-            <a href="index.html" class="nav-link active">🏃‍♂️ Marathon Schedule</a>
+            <a href="index.html" class="nav-link active">🏃‍♂️ Marathon</a>
             <a href="about.html" class="nav-link">📖 Library</a>
             <a href="contact.html" class="nav-link">📊 Workouts</a>
         </nav>
@@ -68,12 +81,12 @@
     <div class="main-pane">
         <div class="header-row">
             <div class="user-greeting">
-                <h1>AIJAZ MARATHON SCHEDULE</h1>
-                <p id="status-text">Data is live and syncing...</p>
+                <h1>AIJAZ MARATHON</h1>
+                <p style="color:var(--text-light); font-size:0.8rem;">CLOUD SYNC ACTIVE</p>
             </div>
             <div class="action-btns">
-                <button class="btn btn-new" onclick="addNewRow()">+ New Marathon</button>
-                <button class="btn btn-report" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn btn-new" onclick="addNewRow()">+ New</button>
+                <button class="btn btn-report" onclick="exportToCSV()">Export</button>
             </div>
         </div>
 
@@ -81,18 +94,17 @@
             <table id="marathonTable">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">Marathon Name</th>
+                        <th style="width: 25%;">Name</th>
                         <th style="width: 15%;">Date</th>
                         <th style="width: 20%;">Status</th>
                         <th style="width: 20%;">Location</th>
-                        <th style="width: 15%;">Amount Paid</th>
+                        <th style="width: 15%;">Paid</th>
                         <th style="width: 5%;"></th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
-            <div id="saveMsg" class="save-indicator">✓ Saved to Cloud</div>
+            <div id="saveMsg" class="save-indicator">✓ Saved</div>
         </div>
     </div>
 
@@ -100,7 +112,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // --- 1. PASTE YOUR CONFIG HERE ---
+        // Use the config you got from Firebase here
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -111,21 +123,16 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   appId: "1:822948950064:web:031df081b41175ef3a7df5"
         };
 
-        // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- 2. LOAD DATA FROM CLOUD ---
         function loadData() {
             db.ref('marathons').on('value', (snapshot) => {
                 const tableBody = document.getElementById("tableBody");
-                tableBody.innerHTML = ""; // Clear current table
+                tableBody.innerHTML = "";
                 const data = snapshot.val();
-                
                 if (data) {
-                    Object.keys(data).forEach(key => {
-                        renderRow(key, data[key]);
-                    });
+                    Object.keys(data).forEach(key => renderRow(key, data[key]));
                 }
             });
         }
@@ -150,11 +157,9 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             tableBody.appendChild(row);
         }
 
-        // --- 3. SAVE & UPDATE ACTIONS ---
         function addNewRow() {
-            const newRef = db.ref('marathons').push();
-            newRef.set({
-                name: "New Marathon",
+            db.ref('marathons').push({
+                name: "New Event",
                 date: new Date().toISOString().split('T')[0],
                 status: "Yet to happen",
                 location: "City",
@@ -164,19 +169,12 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         function updateDB(id, field, value) {
             db.ref('marathons/' + id).update({ [field]: value });
-            showSaveIndicator();
+            document.getElementById("saveMsg").style.display = "block";
+            setTimeout(() => document.getElementById("saveMsg").style.display = "none", 2000);
         }
 
         function deleteFromDB(id) {
-            if(confirm("Delete this entry?")) {
-                db.ref('marathons/' + id).remove();
-            }
-        }
-
-        function showSaveIndicator() {
-            const msg = document.getElementById("saveMsg");
-            msg.style.display = "block";
-            setTimeout(() => msg.style.display = "none", 2000);
+            if(confirm("Delete?")) db.ref('marathons/' + id).remove();
         }
 
         function exportToCSV() {
@@ -184,15 +182,12 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                 const data = snapshot.val();
                 let csv = "data:text/csv;charset=utf-8,Name,Date,Status,Location,Amount\n";
                 if(data) {
-                    Object.values(data).forEach(v => {
-                        csv += `"${v.name}",${v.date},${v.status},"${v.location}",${v.amount}\n`;
-                    });
+                    Object.values(data).forEach(v => { csv += `"${v.name}",${v.date},${v.status},"${v.location}",${v.amount}\n`; });
                     window.open(encodeURI(csv));
                 }
             });
         }
 
-        // Start the app
         loadData();
     </script>
 </body>
