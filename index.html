@@ -4,136 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aijaz - Marathon Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --sidebar-bg: #FFFFFF;
             --primary-blue: #2563eb;
-            --ice-blue: #f0f9ff;
-            --text-main: #1e293b;
-            --text-light: #64748b;
+            --ice-blue: #f8fafc;
             --border-color: #cbd5e1;
-            --status-yet: #fef9c3;
-            --status-completed: #dcfce7;
-            --status-missed: #fee2e2;
+            /* Status Colors */
+            --color-completed: #16a34a;
+            --color-pending: #ca8a04;
+            --color-missed: #dc2626;
         }
 
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; color: var(--text-main); overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
 
         /* --- SIDEBAR --- */
-        .sidebar { width: 260px; background-color: var(--sidebar-bg); height: 100vh; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; border-right: 1px solid var(--border-color); transition: 0.3s; position: relative; z-index: 100; }
-        body.collapsed .sidebar { width: 80px; padding: 25px 10px; }
-        body.collapsed .brand-name, body.collapsed .nav-text { display: none; }
+        .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; }
+        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 10px; border-radius: 8px; display: block; margin-bottom: 5px; }
+        .nav-link.active { background: var(--ice-blue); color: var(--primary-blue); }
+
+        /* --- MAIN CONTENT --- */
+        .main-pane { flex-grow: 1; padding: 25px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.9), rgba(241, 245, 249, 0.9)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; }
+
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-row h1 { margin: 0; font-size: 1.5rem; color: #008080; }
+
+        /* --- SUMMARY STATS --- */
+        .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-card h3 { margin: 0; font-size: 0.7rem; text-transform: uppercase; color: #64748b; }
+        .stat-card p { margin: 5px 0 0; font-size: 1.3rem; font-weight: 700; }
+
+        /* --- TABLE AREA --- */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         
-        .toggle-btn { position: absolute; right: -15px; top: 30px; background: var(--primary-blue); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-        .logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
-        .logo-icon { width: 25px; height: 25px; background: var(--primary-blue); border-radius: 6px; }
-        .brand-name { font-weight: 800; font-size: 1.2rem; color: var(--primary-blue); }
-
-        .nav-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 15px; margin-bottom: 5px; }
-        .nav-link.active { color: var(--primary-blue); background-color: var(--ice-blue); }
-
-        /* --- MAIN PANE --- */
-        .main-pane { 
-            flex-grow: 1; padding: 30px; box-sizing: border-box; overflow-y: auto; 
-            background: linear-gradient(rgba(240, 249, 255, 0.9), rgba(240, 249, 255, 0.9)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png');
-            background-size: cover; background-position: center; background-attachment: fixed;
-        }
-
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .user-greeting h1 { margin:0; font-weight:800; font-size:1.8rem; color: #008080; } 
+        table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 0.9rem; }
+        th { background: #f8fafc; padding: 12px; border: 1px solid var(--border-color); font-weight: 700; text-align: left; color: #334155; white-space: nowrap; }
+        td { padding: 10px; border: 1px solid var(--border-color); vertical-align: middle; }
         
-        /* --- SUMMARY SECTION --- */
-        .summary-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; text-align: center; }
-        .stat-card h3 { margin: 0; font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-card p { margin: 10px 0 0; font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); }
+        /* Dynamic Status Colors */
+        .status-Completed { color: var(--color-completed); font-weight: 700; }
+        .status-Pending { color: var(--color-pending); font-weight: 700; }
+        .status-Missed { color: var(--color-missed); font-weight: 700; }
 
-        .dashboard-flex { display: flex; gap: 25px; align-items: flex-start; }
-        .table-section { flex: 3; }
-        .yearly-section { flex: 1; min-width: 250px; }
+        input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; color: inherit; }
+        .editable { min-height: 20px; }
 
-        /* --- TABLE STYLING --- */
-        .table-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; } 
-        th { text-align: left; color: var(--primary-blue); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; padding: 15px; border-bottom: 2px solid #f1f5f9; }
-        td { padding: 14px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 500; font-size: 0.9rem; }
-        tr:hover td { background-color: var(--ice-blue) !important; }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .btn-new { background: var(--primary-blue); color: white; }
+        .btn-csv { background: #008080; color: white; margin-left: 8px; }
+        .btn-del { color: #ef4444; background: none; font-size: 1.2rem; cursor: pointer; }
 
-        .btn { border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-new { background-color: var(--primary-blue); color: white; }
-        .btn-report { background-color: #008080; color: white; margin-left: 10px; }
-
-        .status-select { font-weight: 700; border-radius: 8px; padding: 5px; border: none; cursor: pointer; }
-        .status-yet { background: var(--status-yet); color: #854d0e; }
-        .status-completed { background: var(--status-completed); color: #166534; }
-        .status-missed { background: var(--status-missed); color: #991b1b; }
-
-        .editable:empty:before { content: attr(data-placeholder); color: #cbd5e1; font-style: italic; }
-        input[type="date"], input[type="number"] { border: none; font-family: inherit; font-weight: 600; width: 100%; outline: none; background: transparent; }
-
-        @media (max-width: 1100px) { .dashboard-flex { flex-direction: column; } .yearly-section { width: 100%; } }
+        /* Yearly Summary Mini-Table */
+        .yearly-box { margin-top: 25px; width: 300px; }
     </style>
 </head>
-<body id="bodyContainer">
+<body>
 
     <div class="sidebar">
-        <button class="toggle-btn" onclick="toggleSidebar()">»</button>
-        <div class="logo-area"><div class="logo-icon"></div><div class="brand-name">FLUXION</div></div>
-        <nav class="nav-links">
-            <a href="#" class="nav-link active"><span>🏃‍♂️</span><span class="nav-text">Marathon Tracker</span></a>
-            <a href="#" class="nav-link"><span>📊</span><span class="nav-text">Analytics</span></a>
+        <div class="logo">FLUXION</div>
+        <nav>
+            <a href="#" class="nav-link active">🏃 Marathon Tracker</a>
         </nav>
     </div>
 
     <div class="main-pane">
         <div class="header-row">
-            <div class="user-greeting">
-                <h1>Marathon Tracker</h1>
-                <p style="color:var(--text-light); font-size:0.85rem;">Your personal race legacy</p>
-            </div>
+            <h1>Marathon Tracker</h1>
             <div>
-                <button class="btn btn-new" onclick="addNewRow()">+ New Event</button>
-                <button class="btn btn-report" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn btn-new" onclick="addNewRow()">+ Add Race</button>
+                <button class="btn btn-csv" onclick="exportToCSV()">Export CSV</button>
             </div>
         </div>
 
-        <div class="summary-container">
-            <div class="stat-card"><h3>Completed</h3><p id="stat-completed">0</p></div>
-            <div class="stat-card"><h3>Pending</h3><p id="stat-pending">0</p></div>
-            <div class="stat-card"><h3>Missed</h3><p id="stat-missed">0</p></div>
-            <div class="stat-card"><h3>Total Paid</h3><p id="stat-total-paid">$0.00</p></div>
+        <div class="summary-bar">
+            <div class="stat-card"><h3>Completed</h3><p id="stat-completed" style="color:var(--color-completed)">0</p></div>
+            <div class="stat-card"><h3>Pending</h3><p id="stat-pending" style="color:var(--color-pending)">0</p></div>
+            <div class="stat-card"><h3>Missed</h3><p id="stat-missed" style="color:var(--color-missed)">0</p></div>
+            <div class="stat-card"><h3>Total Paid (₹)</h3><p id="stat-total-paid">0</p></div>
         </div>
 
-        <div class="dashboard-flex">
-            <div class="table-section">
-                <div class="table-card">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>🏃 Marathon Name</th>
-                                <th>📏 Distance</th>
-                                <th>📅 Date</th>
-                                <th>⚡ Status</th>
-                                <th>📍 Location</th>
-                                <th>💰 Amount</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Marathon Name</th>
+                        <th style="width: 12%;">Distance</th>
+                        <th style="width: 15%;">Date</th>
+                        <th style="width: 15%;">Status</th>
+                        <th style="width: 18%;">Location</th>
+                        <th style="width: 10%;">Paid (₹)</th>
+                        <th style="width: 5%; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
 
-            <div class="yearly-section">
-                <div class="table-card" style="padding: 15px;">
-                    <h3 style="margin-top:0; font-size: 0.9rem; color: var(--primary-blue);">Yearly Breakdown</h3>
-                    <table style="font-size: 0.85rem;">
-                        <thead><tr><th>Year</th><th>Events</th><th>Paid</th></tr></thead>
-                        <tbody id="yearlyBody"></tbody>
-                    </table>
-                </div>
+        <div class="yearly-box">
+            <div class="table-container">
+                <table style="font-size: 0.8rem;">
+                    <thead>
+                        <tr><th colspan="3" style="text-align: center; background: #f1f5f9;">Yearly Summary</th></tr>
+                        <tr><th>Year</th><th>Races</th><th>Total ₹</th></tr>
+                    </thead>
+                    <tbody id="yearlyBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -154,23 +131,19 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function toggleSidebar() { document.getElementById('bodyContainer').classList.toggle('collapsed'); }
-
         function updateStats(items) {
-            let completed = 0, pending = 0, missed = 0, totalPaid = 0;
+            let comp = 0, pend = 0, miss = 0, total = 0;
             let yearly = {};
 
             items.forEach(item => {
-                // Status counts
-                if (item.status === 'Completed') completed++;
-                else if (item.status === 'Missed') missed++;
-                else pending++;
+                const status = item.status === 'Completed' ? 'Completed' : (item.status === 'Missed' ? 'Missed' : 'Pending');
+                if (status === 'Completed') comp++;
+                else if (status === 'Missed') miss++;
+                else pend++;
 
-                // Money
                 const amt = parseFloat(item.amount) || 0;
-                totalPaid += amt;
+                total += amt;
 
-                // Yearly breakdown
                 if (item.date) {
                     const year = new Date(item.date).getFullYear();
                     if (!yearly[year]) yearly[year] = { count: 0, paid: 0 };
@@ -179,38 +152,37 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                 }
             });
 
-            document.getElementById('stat-completed').innerText = completed;
-            document.getElementById('stat-pending').innerText = pending;
-            document.getElementById('stat-missed').innerText = missed;
-            document.getElementById('stat-total-paid').innerText = '$' + totalPaid.toFixed(2);
+            document.getElementById('stat-completed').innerText = comp;
+            document.getElementById('stat-pending').innerText = pend;
+            document.getElementById('stat-missed').innerText = miss;
+            document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
 
-            const yearlyBody = document.getElementById('yearlyBody');
-            yearlyBody.innerHTML = "";
-            Object.keys(yearly).sort((a,b) => b-a).forEach(year => {
-                const row = `<tr><td>${year}</td><td>${yearly[year].count}</td><td>$${yearly[year].paid.toFixed(2)}</td></tr>`;
-                yearlyBody.innerHTML += row;
+            const yBody = document.getElementById('yearlyBody');
+            yBody.innerHTML = "";
+            Object.keys(yearly).sort((a,b) => b-a).forEach(y => {
+                yBody.innerHTML += `<tr><td>${y}</td><td>${yearly[y].count}</td><td>₹${yearly[y].paid.toLocaleString('en-IN')}</td></tr>`;
             });
         }
 
         function renderRow(id, item) {
             const tableBody = document.getElementById("tableBody");
             const row = document.createElement("tr");
-            const sClass = item.status === 'Completed' ? 'status-completed' : (item.status === 'Missed' ? 'status-missed' : 'status-yet');
+            const cleanStatus = item.status === 'Completed' ? 'Completed' : (item.status === 'Missed' ? 'Missed' : 'Pending');
 
             row.innerHTML = `
-                <td><div class="editable" contenteditable="true" data-placeholder="Race name..." onblur="updateDB('${id}', 'name', this.innerText)">${item.name || ''}</div></td>
-                <td><div class="editable" contenteditable="true" data-placeholder="e.g. 42k" onblur="updateDB('${id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'name', this.innerText)">${item.name || ''}</div></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
                 <td><input type="date" value="${item.date || ''}" onchange="updateDB('${id}', 'date', this.value)"></td>
-                <td>
-                    <select class="status-select ${sClass}" onchange="updateDB('${id}', 'status', this.value)">
-                        <option value="Yet to happen" ${item.status === 'Yet to happen' ? 'selected' : ''}>Pending</option>
-                        <option value="Completed" ${item.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                        <option value="Missed" ${item.status === 'Missed' ? 'selected' : ''}>Missed</option>
+                <td class="status-${cleanStatus}">
+                    <select onchange="updateDB('${id}', 'status', this.value)">
+                        <option value="Pending" ${cleanStatus === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Completed" ${cleanStatus === 'Completed' ? 'selected' : ''}>Completed</option>
+                        <option value="Missed" ${cleanStatus === 'Missed' ? 'selected' : ''}>Missed</option>
                     </select>
                 </td>
-                <td><div class="editable" contenteditable="true" data-placeholder="City..." onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
-                <td><input type="number" step="0.01" value="${item.amount || ''}" onblur="updateDB('${id}', 'amount', this.value)"></td>
-                <td><button style="color:#ef4444; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${id}')">×</button></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
+                <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${id}', 'amount', this.value)"></td>
+                <td style="text-align:center;"><button class="btn-del" onclick="deleteFromDB('${id}')">×</button></td>
             `;
             tableBody.appendChild(row);
         }
@@ -230,11 +202,11 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         function addNewRow() {
             const today = new Date().toISOString().split('T')[0];
-            db.ref('marathons').push({ name: "", distance: "", date: today, status: "Yet to happen", location: "", amount: 0 });
+            db.ref('marathons').push({ name: "", distance: "", date: today, status: "Pending", location: "", amount: 0 });
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Remove this race?")) db.ref('marathons/' + id).remove(); }
+        function deleteFromDB(id) { if(confirm("Delete record?")) db.ref('marathons/' + id).remove(); }
         
         loadData();
     </script>
