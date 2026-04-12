@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz - Marathon Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Marathon Tracker - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -14,50 +14,61 @@
             --color-completed: #16a34a;
             --color-pending: #ca8a04;
             --color-missed: #dc2626;
+            --header-teal: #008080;
         }
 
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
 
         /* --- SIDEBAR --- */
-        .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; }
-        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 10px; border-radius: 8px; display: block; margin-bottom: 5px; }
-        .nav-link.active { background: var(--ice-blue); color: var(--primary-blue); }
+        .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; transition: 0.3s; }
+        body.collapsed .sidebar { width: 70px; }
+        .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; white-space: nowrap; }
+        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .nav-link.active { background: #eff6ff; color: var(--primary-blue); }
 
         /* --- MAIN CONTENT --- */
-        .main-pane { flex-grow: 1; padding: 25px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.9), rgba(241, 245, 249, 0.9)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; }
+        .main-pane { flex-grow: 1; padding: 30px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
 
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header-row h1 { margin: 0; font-size: 1.5rem; color: #008080; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .header-row h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: var(--header-teal); }
 
-        /* --- SUMMARY STATS --- */
-        .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .stat-card h3 { margin: 0; font-size: 0.7rem; text-transform: uppercase; color: #64748b; }
-        .stat-card p { margin: 5px 0 0; font-size: 1.3rem; font-weight: 700; }
+        /* --- SUMMARY CARDS --- */
+        .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
+        .stat-card p { margin: 8px 0 0; font-size: 1.6rem; font-weight: 800; }
 
-        /* --- TABLE AREA --- */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        /* --- TABLES --- */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
         
-        table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 0.9rem; }
-        th { background: #f8fafc; padding: 12px; border: 1px solid var(--border-color); font-weight: 700; text-align: left; color: #334155; white-space: nowrap; }
-        td { padding: 10px; border: 1px solid var(--border-color); vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        th { background: #f8fafc; padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; color: #334155; font-size: 0.85rem; }
+        td { padding: 12px; border: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9rem; font-weight: 500; }
         
-        /* Dynamic Status Colors */
-        .status-Completed { color: var(--color-completed); font-weight: 700; }
-        .status-Pending { color: var(--color-pending); font-weight: 700; }
-        .status-Missed { color: var(--color-missed); font-weight: 700; }
+        /* Inline Status Colors */
+        .status-Completed select { color: var(--color-completed); font-weight: 800; }
+        .status-Pending select { color: var(--color-pending); font-weight: 800; }
+        .status-Missed select { color: var(--color-missed); font-weight: 800; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; color: inherit; }
-        .editable { min-height: 20px; }
+        .editable:empty:before { content: attr(data-placeholder); color: #cbd5e1; font-style: italic; }
 
-        .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        /* --- BUTTONS --- */
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-new { background: var(--primary-blue); color: white; }
-        .btn-csv { background: #008080; color: white; margin-left: 8px; }
-        .btn-del { color: #ef4444; background: none; font-size: 1.2rem; cursor: pointer; }
+        .btn-csv { background: var(--header-teal); color: white; margin-left: 8px; }
+        .btn-del { color: #ef4444; background: none; font-size: 1.4rem; cursor: pointer; border: none; }
 
-        /* Yearly Summary Mini-Table */
-        .yearly-box { margin-top: 25px; width: 300px; }
+        /* --- NESTED SUMMARY --- */
+        .yearly-box { max-width: 700px; }
+        .year-row { background-color: #f1f5f9; font-weight: 800; color: #1e293b; }
+        .month-row { background-color: #ffffff; color: #64748b; font-size: 0.85rem; }
+        .indent { padding-left: 30px !important; font-weight: 600; }
+        .text-center { text-align: center; }
+
+        @media (max-width: 1024px) {
+            .summary-bar { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body>
@@ -66,6 +77,7 @@
         <div class="logo">FLUXION</div>
         <nav>
             <a href="#" class="nav-link active">🏃 Marathon Tracker</a>
+            <a href="#" class="nav-link">📊 Performance</a>
         </nav>
     </div>
 
@@ -104,10 +116,16 @@
 
         <div class="yearly-box">
             <div class="table-container">
-                <table style="font-size: 0.8rem;">
+                <table>
                     <thead>
-                        <tr><th colspan="3" style="text-align: center; background: #f1f5f9;">Yearly Summary</th></tr>
-                        <tr><th>Year</th><th>Races</th><th>Total ₹</th></tr>
+                        <tr><th colspan="5" style="text-align: center; background: #e2e8f0; font-size: 0.9rem;">Annual & Monthly Summary (Nested)</th></tr>
+                        <tr>
+                            <th>Year / Month</th>
+                            <th class="text-center">Comp.</th>
+                            <th class="text-center">Pend.</th>
+                            <th class="text-center">Miss.</th>
+                            <th class="text-center">Total ₹</th>
+                        </tr>
                     </thead>
                     <tbody id="yearlyBody"></tbody>
                 </table>
@@ -119,6 +137,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
+        // --- CONFIGURATION ---
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -131,68 +150,97 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // --- CORE LOGIC ---
         function updateStats(items) {
             let comp = 0, pend = 0, miss = 0, total = 0;
-            let yearly = {};
+            let nestedData = {};
 
             items.forEach(item => {
-                const status = item.status === 'Completed' ? 'Completed' : (item.status === 'Missed' ? 'Missed' : 'Pending');
+                const rawStatus = item.status || 'Pending';
+                const status = rawStatus === 'Completed' ? 'Completed' : (rawStatus === 'Missed' ? 'Missed' : 'Pending');
+                const amt = parseFloat(item.amount) || 0;
+
+                // Main Stats
                 if (status === 'Completed') comp++;
                 else if (status === 'Missed') miss++;
                 else pend++;
-
-                const amt = parseFloat(item.amount) || 0;
                 total += amt;
 
+                // Nested Nesting (Year > Month)
                 if (item.date) {
-                    const year = new Date(item.date).getFullYear();
-                    if (!yearly[year]) yearly[year] = { count: 0, paid: 0 };
-                    yearly[year].count++;
-                    yearly[year].paid += amt;
+                    const d = new Date(item.date);
+                    const y = d.getFullYear();
+                    const m = d.toLocaleString('default', { month: 'Long' });
+
+                    if (!nestedData[y]) nestedData[y] = { comp: 0, pend: 0, miss: 0, paid: 0, months: {} };
+                    if (!nestedData[y].months[m]) nestedData[y].months[m] = { comp: 0, pend: 0, miss: 0, paid: 0 };
+
+                    const statKey = status === 'Completed' ? 'comp' : (status === 'Missed' ? 'miss' : 'pend');
+                    nestedData[y][statKey]++;
+                    nestedData[y].paid += amt;
+                    nestedData[y].months[m][statKey]++;
+                    nestedData[y].months[m].paid += amt;
                 }
             });
 
+            // Update UI Cards
             document.getElementById('stat-completed').innerText = comp;
             document.getElementById('stat-pending').innerText = pend;
             document.getElementById('stat-missed').innerText = miss;
             document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
 
+            // Render Nested Table
             const yBody = document.getElementById('yearlyBody');
             yBody.innerHTML = "";
-            Object.keys(yearly).sort((a,b) => b-a).forEach(y => {
-                yBody.innerHTML += `<tr><td>${y}</td><td>${yearly[y].count}</td><td>₹${yearly[y].paid.toLocaleString('en-IN')}</td></tr>`;
+            Object.keys(nestedData).sort((a,b) => b-a).forEach(year => {
+                const yd = nestedData[year];
+                yBody.innerHTML += `<tr class="year-row">
+                    <td>📅 ${year}</td>
+                    <td class="text-center">${yd.comp}</td><td class="text-center">${yd.pend}</td>
+                    <td class="text-center">${yd.miss}</td><td class="text-center">₹${yd.paid.toLocaleString('en-IN')}</td>
+                </tr>`;
+
+                Object.keys(yd.months).forEach(month => {
+                    const md = yd.months[month];
+                    yBody.innerHTML += `<tr class="month-row">
+                        <td class="indent">└ ${month}</td>
+                        <td class="text-center">${md.comp}</td><td class="text-center">${md.pend}</td>
+                        <td class="text-center">${md.miss}</td><td class="text-center">₹${md.paid.toLocaleString('en-IN')}</td>
+                    </tr>`;
+                });
             });
         }
 
         function renderRow(id, item) {
             const tableBody = document.getElementById("tableBody");
             const row = document.createElement("tr");
-            const cleanStatus = item.status === 'Completed' ? 'Completed' : (item.status === 'Missed' ? 'Missed' : 'Pending');
-
+            const status = item.status || 'Pending';
+            
             row.innerHTML = `
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'name', this.innerText)">${item.name || ''}</div></td>
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                <td><div class="editable" contenteditable="true" data-placeholder="e.g. Mumbai Marathon" onblur="updateDB('${id}', 'name', this.innerText)">${item.name || ''}</div></td>
+                <td><div class="editable" contenteditable="true" data-placeholder="e.g. 21k" onblur="updateDB('${id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
                 <td><input type="date" value="${item.date || ''}" onchange="updateDB('${id}', 'date', this.value)"></td>
-                <td class="status-${cleanStatus}">
+                <td class="status-${status}">
                     <select onchange="updateDB('${id}', 'status', this.value)">
-                        <option value="Pending" ${cleanStatus === 'Pending' ? 'selected' : ''}>Pending</option>
-                        <option value="Completed" ${cleanStatus === 'Completed' ? 'selected' : ''}>Completed</option>
-                        <option value="Missed" ${cleanStatus === 'Missed' ? 'selected' : ''}>Missed</option>
+                        <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
                     </select>
                 </td>
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
-                <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${id}', 'amount', this.value)"></td>
+                <td><div class="editable" contenteditable="true" data-placeholder="City" onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
+                <td><input type="number" step="0.01" value="${item.amount || ''}" onblur="updateDB('${id}', 'amount', this.value)"></td>
                 <td style="text-align:center;"><button class="btn-del" onclick="deleteFromDB('${id}')">×</button></td>
             `;
             tableBody.appendChild(row);
         }
 
         function loadData() {
-            db.ref('marathons').on('value', (s) => {
+            db.ref('marathons').on('value', (snapshot) => {
                 document.getElementById("tableBody").innerHTML = "";
-                const data = s.val();
+                const data = snapshot.val();
                 if (data) {
                     const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                    // Chronological Sort
                     items.sort((a, b) => new Date(a.date) - new Date(b.date));
                     items.forEach(item => renderRow(item.id, item));
                     updateStats(items);
@@ -206,8 +254,30 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete record?")) db.ref('marathons/' + id).remove(); }
         
+        function deleteFromDB(id) { if(confirm("Remove this marathon record?")) db.ref('marathons/' + id).remove(); }
+
+        function exportToCSV() {
+            db.ref('marathons').once('value', (s) => {
+                const data = s.val();
+                let csv = "Name,Distance,Date,Status,Location,Paid\n";
+                if(data) {
+                    Object.values(data).forEach(v => {
+                        csv += `"${v.name}","${v.distance}",${v.date},${v.status},"${v.location}",${v.amount}\n`;
+                    });
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('hidden', '');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', 'marathon_data.csv');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            });
+        }
+
         loadData();
     </script>
 </body>
