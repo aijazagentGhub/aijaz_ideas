@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz - Marathon Tracker Pro</title>
+    <title>Aijaz - Marathon Live Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --sidebar-bg: #FFFFFF;
-            --main-bg: #F0F2F5;
+            --main-bg: #F0F2F5; /* Standard gray backup */
             --primary-orange: #FF6B00;
             --text-dark: #2A3B4C;
             --text-light: #808D9A;
             --active-tab-bg: #FFEADF;
-            --border-color: #cbd5e1; /* Slightly darker for visible borders */
-            --hover-beige: #F5F5DC;
+            --border-color: #cbd5e1;
+            --hover-beige: rgba(245, 245, 220, 0.9); /* Opaque hover for text clarity */
             --status-yellow: #fef9c3;
             --status-green: #dcfce7;
             --status-red: #fee2e2;
         }
 
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; background-color: var(--main-bg); color: var(--text-dark); overflow: hidden; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; color: var(--text-dark); overflow: hidden; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR (Kept white for sharp menu) --- */
         .sidebar { width: 260px; background-color: var(--sidebar-bg); height: 100vh; display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; border-right: 2px solid var(--border-color); transition: all 0.3s ease; position: relative; z-index: 100; }
         body.collapsed .sidebar { width: 80px; padding: 25px 10px; }
         body.collapsed .brand-name, body.collapsed .nav-text { display: none; }
@@ -36,22 +36,43 @@
         .nav-link { text-decoration: none; color: var(--text-light); font-weight: 600; font-size: 0.9rem; padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 15px; margin-bottom: 5px; }
         .nav-link.active { color: var(--primary-orange); background-color: var(--active-tab-bg); }
 
-        /* --- MAIN CONTENT --- */
-        .main-pane { flex-grow: 1; padding: 40px; box-sizing: border-box; overflow-y: auto; width: 100%; }
+        /* --- MAIN CONTENT (WITH DYNAMIC BACKGROUND) --- */
+        .main-pane { 
+            flex-grow: 1; 
+            padding: 40px; 
+            box-sizing: border-box; 
+            overflow-y: auto; 
+            width: 100%;
+            /* SETS THE RUNNING GRAPHIC BACKGROUND */
+            background-image: url('background.png');
+            background-size: cover; /* Ensures image fills the entire pane */
+            background-position: center; /* Centers the running figures */
+            background-repeat: no-repeat;
+            background-color: #008080; /* Teal backup color in case image fails */
+        }
+
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-row h1 { color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); } /* Enhanced title visibility on background */
         
         .btn { border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
         .btn-new { background-color: white; border: 1px solid var(--border-color); }
-        .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; }
+        .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; box-shadow: 0 4px 15px rgba(255,107,0,0.3); }
 
-        /* --- TABLE WITH DRAGGABLE COLUMNS & BORDERS --- */
-        .table-card { background-color: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); overflow-x: auto; border: 1px solid var(--border-color); }
+        /* --- TABLE AREA (Semi-Transparent Card) --- */
+        .table-card { 
+            background-color: rgba(255, 255, 255, 0.92); /* Let background show through slightly */
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            overflow-x: auto; 
+            border: 1px solid var(--border-color); 
+        }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid var(--border-color); padding: 12px 15px; position: relative; }
+        th, td { border: 1px solid var(--border-color); padding: 12px 15px; position: relative; color: var(--text-dark); }
         th { background-color: #f8fafc; color: var(--text-light); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
         
-        /* Hover color */
+        /* Hover color over transparency */
         tr:hover td { background-color: var(--hover-beige) !important; }
 
         /* Resizer Handle */
@@ -60,7 +81,7 @@
 
         input, select, .editable { border: none; background: transparent; font-family: inherit; width: 100%; color: var(--text-dark); outline: none; }
         
-        /* Status Colors */
+        /* Status Colors (Adjusted for light transparency background) */
         .status-select { font-weight: 700; border-radius: 4px; padding: 4px; border: 1px solid rgba(0,0,0,0.05); }
         .status-yet { background-color: var(--status-yellow); color: #854d0e; }
         .status-completed { background-color: var(--status-green); color: #166534; }
@@ -70,6 +91,7 @@
             .sidebar { position: fixed; left: -260px; height: 100%; }
             body.mobile-open .sidebar { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
             .toggle-btn { right: -40px; }
+            .main-pane { background-position: calc(50% + 130px) center; } /* Offset background on mobile toggle */
         }
     </style>
 </head>
@@ -91,8 +113,8 @@
     <div class="main-pane">
         <div class="header-row">
             <div class="user-greeting">
-                <h1>AIJAZ MARATHON TRACKER</h1>
-                <p style="font-size: 0.8rem; color: var(--text-light);">DRAG COLUMN EDGES TO RESIZE</p>
+                <h1 style="margin:0; font-weight:800; font-size:1.8rem;">AIJAZ MARATHON TRACKER</h1>
+                <p style="font-size: 0.8rem; color: #E0E7FF; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">Data is live and syncing to cloud</p>
             </div>
             <div class="action-btns">
                 <button class="btn btn-new" onclick="addNewRow()">+ New Event</button>
@@ -121,7 +143,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // Use your Firebase config
+        // --- YOUR CONFIG (PASTE AGAIN HERE) ---
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -203,12 +225,12 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         }
 
         function addNewRow() {
-            db.ref('marathons').push({ name: "New Event", date: "2026-04-12", status: "Yet to happen", location: "Location", amount: 0.00 });
+            db.ref('marathons').push({ name: "New Marathon Name", date: "2026-04-12", status: "Yet to happen", location: "Location", amount: 0.00 });
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete?")) db.ref('marathons/' + id).remove(); }
-        function exportToCSV() { /* ... same as before ... */ }
+        function deleteFromDB(id) { if(confirm("Delete this entry?")) db.ref('marathons/' + id).remove(); }
+        function exportToCSV() { /* ... export as before ... */ }
 
         loadData();
     </script>
