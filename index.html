@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Responsive & Collapsible</title>
+    <title>Marathon Tracker - Refined</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,68 +20,65 @@
 
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- COLLAPSIBLE SIDEBAR --- */
+        /* --- SIDEBAR --- */
         .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s ease; position: relative; }
         .sidebar.collapsed { width: 60px; padding: 20px 10px; }
         .sidebar.collapsed .logo, .sidebar.collapsed .nav-text { display: none; }
-        
         .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; white-space: nowrap; }
-        .toggle-btn { position: absolute; top: 20px; right: -15px; background: var(--primary-blue); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 10; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
+        .toggle-btn { position: absolute; top: 20px; right: -15px; background: var(--primary-blue); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 10; font-weight: bold; }
         .nav-link { text-decoration: none; color: var(--primary-blue); font-weight: 600; padding: 12px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; gap: 10px; }
 
         /* --- MAIN CONTENT --- */
         .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
         
-        /* --- RED ALERT BANNER --- */
+        /* --- ICE BLUE BANNER WITH RED BORDER --- */
         @keyframes blinker { 50% { opacity: 0.3; } }
         .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; }
         .upcoming-banner { 
-            background: var(--alert-red); 
-            color: white; 
+            background: var(--ice-blue); 
+            color: #1e293b; 
             padding: 12px 25px; 
-            border-radius: 8px; 
+            border-radius: 50px; 
             display: inline-block;
-            border: 3px solid #991b1b;
+            border: 3px solid var(--alert-red); /* Red Border Only */
             text-align: center;
             font-weight: 800;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
-            animation: blinker 0.5s linear 5;
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15);
+            animation: blinker 0.6s linear 5;
         }
 
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .header-row h1 { margin: 0; font-size: 1.5rem; font-weight: 800; color: #334155; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
+        .header-row h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #334155; }
 
-        /* --- RESPONSIVE SUMMARY --- */
-        .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; }
-        .stat-card p { margin: 5px 0 0; font-size: 1.4rem; font-weight: 800; }
+        .stat-card p { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; }
 
-        /* --- TABLE SCROLLING --- */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th { background: var(--ice-blue); padding: 12px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.8rem; }
-        td { padding: 10px; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600; }
+        /* --- TABLES --- */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; }
+        td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
         tbody tr:hover { background-color: var(--ice-blue) !important; }
 
+        /* Yearly Table Specific Adjustments */
+        .yearly-table { min-width: 600px; width: 100%; }
+        .yearly-table td, .yearly-table th { text-align: center; }
+
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
-        
         .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
         .btn-new { background: var(--primary-blue); color: white; }
-        .btn-csv { background: var(--header-teal); color: white; }
+        .btn-csv { background: var(--header-teal); color: white; margin-left: 5px; }
 
         .pagination { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 30px; }
-        .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; border-radius: 4px; }
+        .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        /* --- MOBILE SPECIFIC --- */
-        @media (max-width: 600px) {
-            .sidebar { display: none; } /* Hide sidebar on very small screens for better focus */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
             .main-pane { padding: 15px; }
-            .header-row h1 { font-size: 1.2rem; }
-            .stat-card p { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -107,17 +104,17 @@
 
         <div class="header-row">
             <h1>Marathon Tracker</h1>
-            <div style="display: flex; gap: 5px;">
-                <button class="btn btn-new" onclick="addNewRow()">+ Add</button>
-                <button class="btn btn-csv" onclick="exportToCSV()">Export</button>
+            <div>
+                <button class="btn btn-new" onclick="addNewRow()">+ Add Race</button>
+                <button class="btn btn-csv" onclick="exportToCSV()">Export CSV</button>
             </div>
         </div>
 
         <div class="summary-bar">
-            <div class="stat-card"><h3>Comp.</h3><p id="stat-completed" style="color:var(--color-completed)">0</p></div>
-            <div class="stat-card"><h3>Pend.</h3><p id="stat-pending" style="color:var(--color-pending)">0</p></div>
+            <div class="stat-card"><h3>Completed</h3><p id="stat-completed" style="color:var(--color-completed)">0</p></div>
+            <div class="stat-card"><h3>Pending</h3><p id="stat-pending" style="color:var(--color-pending)">0</p></div>
             <div class="stat-card"><h3>Missed</h3><p id="stat-missed" style="color:var(--color-missed)">0</p></div>
-            <div class="stat-card"><h3>Total ₹</h3><p id="stat-total-paid">0</p></div>
+            <div class="stat-card"><h3>Total Paid ₹</h3><p id="stat-total-paid">0</p></div>
         </div>
 
         <div class="table-container">
@@ -125,12 +122,12 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 100px;">Distance (KM)</th>
-                        <th style="width: 130px;">Date</th>
-                        <th style="width: 110px;">Status</th>
+                        <th style="width: 120px;">Distance (KM)</th>
+                        <th style="width: 140px;">Date</th>
+                        <th style="width: 130px;">Status</th>
                         <th>Location</th>
-                        <th style="width: 100px;">Paid (₹)</th>
-                        <th style="width: 40px; text-align: center;"></th>
+                        <th style="width: 120px;">Paid (₹)</th>
+                        <th style="width: 80px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -139,12 +136,12 @@
 
         <div class="pagination" id="paginationControls"></div>
 
-        <div class="table-container" style="max-width: 600px;">
-            <table>
+        <div class="table-container" style="max-width: 800px;">
+            <table class="yearly-table">
                 <thead>
-                    <tr><th colspan="6" style="text-align: center;">Yearly Summary Breakdown</th></tr>
-                    <tr style="font-size: 0.75rem;">
-                        <th>Year</th><th>Runs</th><th>Comp.</th><th>Pend.</th><th>Miss.</th><th>Paid (₹)</th>
+                    <tr><th colspan="6" style="text-align: center; background: var(--ice-blue);">Yearly Summary Breakdown</th></tr>
+                    <tr>
+                        <th>Year</th><th>Total Runs</th><th>Comp.</th><th>Pend.</th><th>Miss.</th><th>Paid (₹)</th>
                     </tr>
                 </thead>
                 <tbody id="yearlyBody"></tbody>
@@ -172,9 +169,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         let currentPage = 1;
         const rowsPerPage = 4;
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-        }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
         function updateStats(items) {
             let comp = 0, pend = 0, miss = 0, total = 0;
@@ -233,7 +228,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                     <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)"><option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option><option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option><option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option></select></td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
-                    <td><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
+                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer; font-size:1.2rem;" onclick="deleteFromDB('${item.id}')">×</button></td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -277,15 +272,14 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete?")) db.ref('marathons/' + id).remove(); }
+        function deleteFromDB(id) { if(confirm("Delete record?")) db.ref('marathons/' + id).remove(); }
         
         function exportToCSV() {
             let csv = "Name,Distance,Date,Status,Location,Amount\n";
             allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'Marathons.csv'; a.click();
+            const a = document.createElement('a'); a.href = url; a.download = 'Marathons_Export.csv'; a.click();
         }
 
         loadData();
