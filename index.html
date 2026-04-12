@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aijaz - Marathon Tracker</title>
+    <title>Aijaz - Marathon Live Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -31,11 +31,10 @@
         .main-pane { flex-grow: 1; padding: 40px; box-sizing: border-box; overflow-y: auto; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .user-greeting h1 { margin: 0; font-weight: 800; font-size: 1.8rem; }
-        .user-greeting p { margin: 5px 0 0; color: var(--text-light); font-size: 0.9rem; text-transform: uppercase; }
-
+        
         .btn { border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
         .btn-new { background-color: white; border: 1px solid var(--border-color); }
-        .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3); }
+        .btn-report { background: linear-gradient(135deg, #FF6B00 0%, #FFB100 100%); color: white; }
 
         /* TABLE CARD */
         .table-card { background-color: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
@@ -49,10 +48,7 @@
         input:focus { outline: none; border-bottom: 1px solid var(--primary-orange); }
         select { color: var(--primary-orange); font-weight: 700; cursor: pointer; }
         
-        /* Pagination */
-        .pagination-area { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); }
-        .pg-btn { background: white; border: 1px solid var(--border-color); padding: 6px 15px; border-radius: 8px; cursor: pointer; color: var(--primary-orange); font-weight: 600; }
-        .pg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .save-indicator { font-size: 0.8rem; color: #10b981; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -72,8 +68,8 @@
     <div class="main-pane">
         <div class="header-row">
             <div class="user-greeting">
-                <h1>AIJAZ MARATHON SCHEDULE/STATUS</h1>
-                <p>Track your runs and payments</p>
+                <h1>AIJAZ MARATHON SCHEDULE</h1>
+                <p id="status-text">Data is live and syncing...</p>
             </div>
             <div class="action-btns">
                 <button class="btn btn-new" onclick="addNewRow()">+ New Marathon</button>
@@ -86,7 +82,7 @@
                 <thead>
                     <tr>
                         <th style="width: 25%;">Marathon Name</th>
-                        <th style="width: 15%;">Date of Run</th>
+                        <th style="width: 15%;">Date</th>
                         <th style="width: 20%;">Status</th>
                         <th style="width: 20%;">Location</th>
                         <th style="width: 15%;">Amount Paid</th>
@@ -96,72 +92,108 @@
                 <tbody id="tableBody">
                     </tbody>
             </table>
-
-            <div class="pagination-area">
-                <button class="pg-btn" id="prevBtn" onclick="changePage(-1)">← Previous</button>
-                <span id="pageInfo" style="font-size: 0.8rem; color: #808D9A;">Page 1 of 1</span>
-                <button class="pg-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
-            </div>
+            <div id="saveMsg" class="save-indicator">✓ Saved to Cloud</div>
         </div>
     </div>
 
-    <script>
-        let currentPage = 1;
-        const rowsPerPage = 6;
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-        function addNewRow() {
+    <script>
+        // --- 1. PASTE YOUR CONFIG HERE ---
+        const firebaseConfig = {
+apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
+  authDomain: "aijazideas.firebaseapp.com",
+  databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "aijazideas",
+  storageBucket: "aijazideas.firebasestorage.app",
+  messagingSenderId: "822948950064",
+  appId: "1:822948950064:web:031df081b41175ef3a7df5"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- 2. LOAD DATA FROM CLOUD ---
+        function loadData() {
+            db.ref('marathons').on('value', (snapshot) => {
+                const tableBody = document.getElementById("tableBody");
+                tableBody.innerHTML = ""; // Clear current table
+                const data = snapshot.val();
+                
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        renderRow(key, data[key]);
+                    });
+                }
+            });
+        }
+
+        function renderRow(id, item) {
             const tableBody = document.getElementById("tableBody");
             const row = document.createElement("tr");
-            
             row.innerHTML = `
-                <td><div class="editable" contenteditable="true" placeholder="Enter name...">New Marathon</div></td>
-                <td><input type="date" value="${new Date().toISOString().split('T')[0]}"></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'name', this.innerText)">${item.name}</div></td>
+                <td><input type="date" value="${item.date}" onchange="updateDB('${id}', 'date', this.value)"></td>
                 <td>
-                    <select>
-                        <option>Yet to happen</option>
-                        <option>Completed</option>
-                        <option>Missed</option>
+                    <select onchange="updateDB('${id}', 'status', this.value)">
+                        <option ${item.status === 'Yet to happen' ? 'selected' : ''}>Yet to happen</option>
+                        <option ${item.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        <option ${item.status === 'Missed' ? 'selected' : ''}>Missed</option>
                     </select>
                 </td>
-                <td><div class="editable" contenteditable="true">City, Country</div></td>
-                <td><input type="number" step="0.01" value="0.00" style="font-weight:bold;"></td>
-                <td><button style="border:none; background:none; color:red; cursor:pointer;" onclick="this.closest('tr').remove(); updatePagination();">×</button></td>
+                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'location', this.innerText)">${item.location}</div></td>
+                <td><input type="number" step="0.01" value="${item.amount}" onblur="updateDB('${id}', 'amount', this.value)"></td>
+                <td><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${id}')">×</button></td>
             `;
-            
-            tableBody.prepend(row);
-            updatePagination();
+            tableBody.appendChild(row);
         }
 
-        function updatePagination() {
-            const rows = document.getElementById("tableBody").rows;
-            const totalPages = Math.ceil(rows.length / rowsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            for (let i = 0; i < rows.length; i++) {
-                rows[i].style.display = (i >= (currentPage-1)*rowsPerPage && i < currentPage*rowsPerPage) ? "" : "none";
+        // --- 3. SAVE & UPDATE ACTIONS ---
+        function addNewRow() {
+            const newRef = db.ref('marathons').push();
+            newRef.set({
+                name: "New Marathon",
+                date: new Date().toISOString().split('T')[0],
+                status: "Yet to happen",
+                location: "City",
+                amount: 0.00
+            });
+        }
+
+        function updateDB(id, field, value) {
+            db.ref('marathons/' + id).update({ [field]: value });
+            showSaveIndicator();
+        }
+
+        function deleteFromDB(id) {
+            if(confirm("Delete this entry?")) {
+                db.ref('marathons/' + id).remove();
             }
-            document.getElementById("pageInfo").innerText = `Page ${currentPage} of ${totalPages}`;
-            document.getElementById("prevBtn").disabled = currentPage === 1;
-            document.getElementById("nextBtn").disabled = currentPage === totalPages || rows.length === 0;
         }
 
-        function changePage(dir) { currentPage += dir; updatePagination(); }
+        function showSaveIndicator() {
+            const msg = document.getElementById("saveMsg");
+            msg.style.display = "block";
+            setTimeout(() => msg.style.display = "none", 2000);
+        }
 
         function exportToCSV() {
-            const rows = document.querySelectorAll("#tableBody tr");
-            let csv = "data:text/csv;charset=utf-8,Marathon,Date,Status,Location,Amount\n";
-            rows.forEach(r => {
-                const name = r.cells[0].innerText;
-                const date = r.querySelector('input[type="date"]').value;
-                const status = r.querySelector('select').value;
-                const loc = r.cells[3].innerText;
-                const amt = r.querySelector('input[type="number"]').value;
-                csv += `"${name}",${date},${status},"${loc}",${amt}\n`;
+            db.ref('marathons').once('value', (snapshot) => {
+                const data = snapshot.val();
+                let csv = "data:text/csv;charset=utf-8,Name,Date,Status,Location,Amount\n";
+                if(data) {
+                    Object.values(data).forEach(v => {
+                        csv += `"${v.name}",${v.date},${v.status},"${v.location}",${v.amount}\n`;
+                    });
+                    window.open(encodeURI(csv));
+                }
             });
-            window.open(encodeURI(csv));
         }
 
-        // Load 2 sample rows
-        for(let i=0; i<2; i++) { addNewRow(); }
+        // Start the app
+        loadData();
     </script>
 </body>
 </html>
