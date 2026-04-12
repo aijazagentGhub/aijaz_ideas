@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Yearly Summary</title>
+    <title>Marathon Tracker - Optimized</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #2563eb;
-            --ice-blue: #f8fafc;
+            --ice-blue: #e0f2fe; /* Distinct Ice Blue for hover */
+            --row-alt: #f8fafc;   /* Smooth identifiable row color */
             --border-color: #cbd5e1;
             --color-completed: #16a34a;
             --color-pending: #ca8a04;
@@ -18,13 +19,10 @@
 
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
         
-        /* --- SIDEBAR --- */
         .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
         .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; }
-        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
-        .nav-link.active { background: #eff6ff; color: var(--primary-blue); }
+        .nav-link { text-decoration: none; color: #64748b; font-weight: 600; padding: 12px; border-radius: 8px; display: block; background: #eff6ff; color: var(--primary-blue); }
 
-        /* --- MAIN PANE --- */
         .main-pane { flex-grow: 1; padding: 30px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
         
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
@@ -37,12 +35,18 @@
         .stat-card p { margin: 8px 0 0; font-size: 1.6rem; font-weight: 800; }
 
         /* --- DATA TABLE --- */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8fafc; padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; color: #334155; font-size: 0.85rem; }
+        
+        /* Smooth Zebra Striping */
+        tbody tr:nth-child(even) { background-color: var(--row-alt); }
+        
+        /* ICE BLUE HOVER */
+        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
+        
         td { padding: 12px; border: 1px solid var(--border-color); vertical-align: middle; font-size: 0.9rem; font-weight: 600; }
         
-        /* Status Color Selectors */
         .status-Completed select { color: var(--color-completed); font-weight: 800; }
         .status-Pending select { color: var(--color-pending); font-weight: 800; }
         .status-Missed select { color: var(--color-missed); font-weight: 800; }
@@ -53,7 +57,12 @@
         .btn-new { background: var(--primary-blue); color: white; }
         .btn-csv { background: var(--header-teal); color: white; margin-left: 8px; }
 
-        /* --- YEARLY TABLE --- */
+        /* --- PAGINATION --- */
+        .pagination { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 30px; }
+        .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
+        .page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .yearly-box { max-width: 700px; }
         .text-center { text-align: center; }
     </style>
@@ -62,7 +71,7 @@
 
     <div class="sidebar">
         <div class="logo">FLUXION</div>
-        <nav><a href="#" class="nav-link active">🏃 Marathon Tracker</a></nav>
+        <nav><a href="#" class="nav-link">🏃 Marathon Tracker</a></nav>
     </div>
 
     <div class="main-pane">
@@ -98,17 +107,19 @@
             </table>
         </div>
 
+        <div class="pagination" id="paginationControls"></div>
+
         <div class="yearly-box">
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr><th colspan="5" style="text-align: center; background: #e2e8f0; font-size: 0.9rem;">Yearly Summary Breakdown</th></tr>
+                        <tr><th colspan="5" style="text-align: center; background: #e2e8f0; font-size: 0.9rem;">Yearly Summary (₹)</th></tr>
                         <tr>
                             <th>Year</th>
                             <th class="text-center">Comp.</th>
                             <th class="text-center">Pend.</th>
                             <th class="text-center">Miss.</th>
-                            <th class="text-center">Total Paid (₹)</th>
+                            <th class="text-center">Total</th>
                         </tr>
                     </thead>
                     <tbody id="yearlyBody"></tbody>
@@ -121,7 +132,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
     <script>
-        // REPLACE WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -134,6 +144,10 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        let allItems = [];
+        let currentPage = 1;
+        const rowsPerPage = 4;
+
         function updateStats(items) {
             let comp = 0, pend = 0, miss = 0, total = 0;
             let yearlyData = {};
@@ -142,13 +156,11 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                 const s = (item.status || 'Pending').toLowerCase();
                 const amt = parseFloat(item.amount) || 0;
 
-                // Counters
                 if (s === 'completed') comp++;
                 else if (s === 'missed') miss++;
                 else pend++;
                 total += amt;
 
-                // Yearly Grouping
                 if (item.date) {
                     const year = new Date(item.date).getFullYear();
                     if (!isNaN(year)) {
@@ -163,6 +175,7 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             document.getElementById('stat-completed').innerText = comp;
             document.getElementById('stat-pending').innerText = pend;
             document.getElementById('stat-missed').innerText = miss;
+            // Rupee symbol removed from the dynamic number itself, kept in header
             document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
 
             const yBody = document.getElementById('yearlyBody');
@@ -175,42 +188,71 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                         <td class="text-center">${yd.comp}</td>
                         <td class="text-center">${yd.pend}</td>
                         <td class="text-center">${yd.miss}</td>
-                        <td class="text-center">₹${yd.paid.toLocaleString('en-IN')}</td>
+                        <td class="text-center">${yd.paid.toLocaleString('en-IN')}</td>
                     </tr>`;
             });
         }
 
-        function renderRow(id, item) {
+        function renderTable() {
             const tableBody = document.getElementById("tableBody");
-            const row = document.createElement("tr");
-            const status = item.status || 'Pending';
-            row.innerHTML = `
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'name', this.innerText)">${item.name || ''}</div></td>
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
-                <td><input type="date" value="${item.date || ''}" onchange="updateDB('${id}', 'date', this.value)"></td>
-                <td class="status-${status}">
-                    <select onchange="updateDB('${id}', 'status', this.value)">
-                        <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
-                        <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
-                        <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
-                    </select>
-                </td>
-                <td><div class="editable" contenteditable="true" onblur="updateDB('${id}', 'location', this.innerText)">${item.location || ''}</div></td>
-                <td><input type="number" step="0.01" value="${item.amount || ''}" onblur="updateDB('${id}', 'amount', this.value)"></td>
-                <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer; font-size:1.2rem;" onclick="deleteFromDB('${id}')">×</button></td>
-            `;
-            tableBody.appendChild(row);
+            tableBody.innerHTML = "";
+
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedItems = allItems.slice(start, end);
+
+            paginatedItems.forEach(item => {
+                const row = document.createElement("tr");
+                const status = item.status || 'Pending';
+                row.innerHTML = `
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                    <td><input type="date" value="${item.date || ''}" onchange="updateDB('${item.id}', 'date', this.value)"></td>
+                    <td class="status-${status}">
+                        <select onchange="updateDB('${item.id}', 'status', this.value)">
+                            <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
+                        </select>
+                    </td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || ''}</div></td>
+                    <td><input type="number" step="0.01" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
+                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const controls = document.getElementById("paginationControls");
+            controls.innerHTML = "";
+            const pageCount = Math.ceil(allItems.length / rowsPerPage);
+
+            if (pageCount <= 1) return;
+
+            for (let i = 1; i <= pageCount; i++) {
+                const btn = document.createElement("button");
+                btn.innerText = i;
+                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                btn.onclick = () => { currentPage = i; renderTable(); };
+                controls.appendChild(btn);
+            }
         }
 
         function loadData() {
             db.ref('marathons').on('value', (s) => {
-                document.getElementById("tableBody").innerHTML = "";
                 const data = s.val();
                 if (data) {
-                    const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                    items.sort((a, b) => new Date(a.date) - new Date(b.date));
-                    items.forEach(item => renderRow(item.id, item));
-                    updateStats(items);
+                    allItems = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                    allItems.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    updateStats(allItems);
+                    renderTable();
+                } else {
+                    allItems = [];
+                    updateStats([]);
+                    renderTable();
                 }
             });
         }
@@ -221,8 +263,8 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Permanently delete this record?")) db.ref('marathons/' + id).remove(); }
-        function exportToCSV() { /* Logic for CSV Export */ }
+        function deleteFromDB(id) { if(confirm("Delete record?")) db.ref('marathons/' + id).remove(); }
+        function exportToCSV() { /* Logic */ }
 
         loadData();
     </script>
