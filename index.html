@@ -91,42 +91,17 @@
     <div class="sidebar" id="sidebar">
         <button class="toggle-btn" onclick="toggleSidebar()">↔</button>
         <div class="logo">FLUXION</div>
-<nav>
-    <a href="javascript:void(0)" onclick="showTab('marathon')" class="nav-link">
-        <span>🏃</span><span class="nav-text">Marathon Tracker</span>
-    </a>
-    <a href="javascript:void(0)" onclick="showTab('ideas')" class="nav-link">
-        <span>💡</span><span class="nav-text">Idea Vault</span>
-    </a>
-    <a href="javascript:void(0)" onclick="addNewPage()" class="nav-link" style="color: #4caf50;">
-        <span>+</span><span class="nav-text">Add Page</span>
-    </a>
-</nav>
+        <nav>
+            <a href="#" class="nav-link"><span>🏃</span><span class="nav-text">Marathon Tracker</span></a>
+        </nav>
     </div>
 
-<div class="main-pane">
-    <div id="page-marathon" class="tab-content">
+    <div class="main-pane">
+        <div class="banner-container">
+            <div class="upcoming-banner" id="upcomingBanner" style="display: none;">
+                Upcoming event! : <span id="bannerContent">...</span>
+            </div>
         </div>
-    <div id="page-ideas" class="tab-content" style="display: none; padding: 20px;">
-        <h2 style="color: #1a237e;">💡 Idea Vault</h2>
-        <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-top: 20px;">
-            <p>Write your ideas below:</p>
-            <textarea style="width: 100%; height: 200px; border-radius: 8px; padding: 10px; border: 1px solid #ccc;"></textarea>
-        </div>
-    </div>
-</div>
-
-    <div id="page-ideas" class="content-page" style="display: none;">
-        <h2 style="margin-top: 20px; color: #1a237e;">💡 Idea Vault</h2>
-        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <p style="color: #666;">What's your next big idea?</p>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-            <textarea placeholder="Type your idea here..." style="width: 100%; height: 150px; border: 1px solid #ddd; border-radius: 10px; padding: 15px; font-family: inherit;"></textarea>
-            <br><br>
-            <button style="background: #1a237e; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Save Idea</button>
-        </div>
-    </div>
-</div>
 
         <div class="header-row">
             <h1>Marathon Tracker</h1>
@@ -323,51 +298,5 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         loadData();
     </script>
-<script>
-function showTab(tabId) {
-    // 1. Find the two slides
-    const marathonPage = document.getElementById('page-marathon');
-    const ideasPage = document.getElementById('page-ideas');
-
-    // 2. The Logic: Show one, Hide the other COMPLETELY
-    if (tabId === 'marathon') {
-        marathonPage.style.display = 'block'; // Marathon takes full space
-        ideasPage.style.display = 'none';    // Ideas disappears
-    } else {
-        marathonPage.style.display = 'none';  // Marathon disappears
-        ideasPage.style.display = 'block';    // Ideas takes full space
-    }
-    
-    console.log("Viewing: " + tabId);
-}
-
-// Logic for adding a brand new tab
-function addNewPage() {
-    const title = prompt("Enter Page Name:");
-    if (title) {
-        const id = title.toLowerCase().replace(/\s+/g, '-');
-        
-        // Add to Sidebar
-        const nav = document.querySelector('nav');
-        const newLink = document.createElement('a');
-        newLink.href = "javascript:void(0)";
-        newLink.className = "nav-link";
-        newLink.onclick = () => showTab(id);
-        newLink.innerHTML = `<span>📄</span><span class="nav-text">${title}</span>`;
-        nav.appendChild(newLink);
-
-        // Add to Content Area
-        const pane = document.getElementById('main-pane');
-        const newDiv = document.createElement('div');
-        newDiv.id = 'page-' + id;
-        newDiv.className = 'tab-content';
-        newDiv.style.display = 'none';
-        newDiv.innerHTML = `<h2>${title}</h2><div style="background:white; padding:20px; border-radius:12px; border:1px solid #ddd;">Content for ${title} coming soon...</div>`;
-        pane.appendChild(newDiv);
-        
-        alert(title + " added!");
-    }
-}
-</script>
 </body>
 </html>
