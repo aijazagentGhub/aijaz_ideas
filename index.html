@@ -104,15 +104,14 @@
 </nav>
     </div>
 
-<div class="main-pane" id="main-pane">
+<div class="main-pane">
     <div id="page-marathon" class="tab-content">
         </div>
-
-    <div id="page-ideas" class="tab-content" style="display: none;">
-        <h2>💡 Idea Vault</h2>
-        <div style="background: white; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ddd;">
-            <p>New ideas and notes go here.</p>
-            <textarea style="width: 100%; height: 200px; margin-top: 10px; border-radius: 8px; padding: 10px;"></textarea>
+    <div id="page-ideas" class="tab-content" style="display: none; padding: 20px;">
+        <h2 style="color: #1a237e;">💡 Idea Vault</h2>
+        <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-top: 20px;">
+            <p>Write your ideas below:</p>
+            <textarea style="width: 100%; height: 200px; border-radius: 8px; padding: 10px; border: 1px solid #ccc;"></textarea>
         </div>
     </div>
 </div>
@@ -326,19 +325,20 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
     </script>
 <script>
 function showTab(tabId) {
-    // 1. Find all sections that have the class 'tab-content'
-    const pages = document.querySelectorAll('.tab-content');
-    
-    // 2. Hide every single one of them
-    pages.forEach(page => {
-        page.style.display = 'none';
-    });
+    // 1. Find the two slides
+    const marathonPage = document.getElementById('page-marathon');
+    const ideasPage = document.getElementById('page-ideas');
 
-    // 3. Show only the one you clicked
-    const activePage = document.getElementById('page-' + tabId);
-    if (activePage) {
-        activePage.style.display = 'block';
+    // 2. The Logic: Show one, Hide the other COMPLETELY
+    if (tabId === 'marathon') {
+        marathonPage.style.display = 'block'; // Marathon takes full space
+        ideasPage.style.display = 'none';    // Ideas disappears
+    } else {
+        marathonPage.style.display = 'none';  // Marathon disappears
+        ideasPage.style.display = 'block';    // Ideas takes full space
     }
+    
+    console.log("Viewing: " + tabId);
 }
 
 // Logic for adding a brand new tab
