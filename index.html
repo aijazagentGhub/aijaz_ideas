@@ -91,28 +91,31 @@
     <div class="sidebar" id="sidebar">
         <button class="toggle-btn" onclick="toggleSidebar()">↔</button>
         <div class="logo">FLUXION</div>
-<nav id="sidebar-nav">
-    <li onclick="showPage('marathon')" id="nav-marathon" class="active" style="display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px;">
-        <span>🏃</span><span class="nav-text" style="margin-left: 10px;">Marathon Tracker</span>
-    </li>
-    <li onclick="showPage('ideas')" id="nav-ideas" style="display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px;">
-        <span>💡</span><span class="nav-text" style="margin-left: 10px;">Idea Vault</span>
-    </li>
-    <li onclick="addNewPage()" style="display: flex; align-items: center; padding: 10px; cursor: pointer; color: #4caf50; font-weight: bold;">
-        <span>➕</span><span class="nav-text" style="margin-left: 10px;">Add Page</span>
-    </li>
+<nav>
+    <a href="javascript:void(0)" onclick="showTab('marathon')" class="nav-link">
+        <span>🏃</span><span class="nav-text">Marathon Tracker</span>
+    </a>
+    <a href="javascript:void(0)" onclick="showTab('ideas')" class="nav-link">
+        <span>💡</span><span class="nav-text">Idea Vault</span>
+    </a>
+    <a href="javascript:void(0)" onclick="addNewPage()" class="nav-link" style="color: #4caf50;">
+        <span>+</span><span class="nav-text">Add Page</span>
+    </a>
 </nav>
     </div>
 
-<div class="main-pane">
-    <div id="page-marathon" class="content-page">
-        <div class="banner-container">
-            <div class="upcoming-banner" id="upcomingBanner" style="display: none;">
-                Upcoming event! : <span id="bannerContent">...</span>
-            </div>
+<div class="main-pane" id="main-pane">
+    <div id="page-marathon" class="tab-content">
         </div>
-        
+
+    <div id="page-ideas" class="tab-content" style="display: none;">
+        <h2>💡 Idea Vault</h2>
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ddd;">
+            <p>New ideas and notes go here.</p>
+            <textarea style="width: 100%; height: 200px; margin-top: 10px; border-radius: 8px; padding: 10px;"></textarea>
         </div>
+    </div>
+</div>
 
     <div id="page-ideas" class="content-page" style="display: none;">
         <h2 style="margin-top: 20px; color: #1a237e;">💡 Idea Vault</h2>
@@ -321,17 +324,49 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         loadData();
     </script>
-    <script>
+<script>
 function showTab(tabId) {
-    // 1. Hide all pages
-    document.getElementById('page-marathon').style.display = 'none';
-    document.getElementById('page-ideas').style.display = 'none';
+    // 1. Find all sections that have the class 'tab-content'
+    const pages = document.querySelectorAll('.tab-content');
     
-    // 2. Show the specific page you clicked
-    document.getElementById('page-' + tabId).style.display = 'block';
-    
-    // 3. Optional: Add 'active' look to the sidebar link
-    console.log("Switched to: " + tabId);
+    // 2. Hide every single one of them
+    pages.forEach(page => {
+        page.style.display = 'none';
+    });
+
+    // 3. Show only the one you clicked
+    const activePage = document.getElementById('page-' + tabId);
+    if (activePage) {
+        activePage.style.display = 'block';
+    }
+}
+
+// Logic for adding a brand new tab
+function addNewPage() {
+    const title = prompt("Enter Page Name:");
+    if (title) {
+        const id = title.toLowerCase().replace(/\s+/g, '-');
+        
+        // Add to Sidebar
+        const nav = document.querySelector('nav');
+        const newLink = document.createElement('a');
+        newLink.href = "javascript:void(0)";
+        newLink.className = "nav-link";
+        newLink.onclick = () => showTab(id);
+        newLink.innerHTML = `<span>📄</span><span class="nav-text">${title}</span>`;
+        nav.appendChild(newLink);
+
+        // Add to Content Area
+        const pane = document.getElementById('main-pane');
+        const newDiv = document.createElement('div');
+        newDiv.id = 'page-' + id;
+        newDiv.className = 'tab-content';
+        newDiv.style.display = 'none';
+        newDiv.innerHTML = `<h2>${title}</h2><div style="background:white; padding:20px; border-radius:12px; border:1px solid #ddd;">Content for ${title} coming soon...</div>`;
+        pane.appendChild(newDiv);
+        
+        alert(title + " added!");
+    }
 }
 </script>
 </body>
