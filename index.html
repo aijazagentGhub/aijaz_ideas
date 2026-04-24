@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FLUXION</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>FLUXION - Personal Hub</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-layout" style="display: flex; min-height: 100vh;">
-        <div class="sidebar" style="width: 250px; background: #1a237e; color: white;">
-            <h1 style="padding: 20px;">FLUXION</h1>
-            <ul style="list-style: none; padding: 0;">
-                <li onclick="switchTab('marathon')" style="padding: 20px; cursor: pointer;">🏃 Marathon Tracker</li>
-                <li onclick="switchTab('ideas')" style="padding: 20px; cursor: pointer;">💡 Idea Vault</li>
+    <div class="main-container">
+        <div class="sidebar">
+            <h1 class="logo">FLUXION</h1>
+            <ul>
+                <li onclick="loadTab('marathon')" id="nav-marathon">🏃 Marathon Tracker</li>
+                <li onclick="loadTab('ideas')" id="nav-ideas">💡 Idea Vault</li>
+                <li onclick="loadTab('expenses')" id="nav-expenses">💰 Daily Expenses</li>
             </ul>
         </div>
 
-        <div id="content-area" style="flex: 1; padding: 20px; background: #f4f7f6;">
+        <div id="content-area" class="main-content">
             </div>
     </div>
 
@@ -26,9 +27,9 @@
         import { renderMarathon } from './marathon.js';
         import { renderIdeas } from './ideas.js';
 
-        // PASTE YOUR REAL FIREBASE CONFIG HERE
+        // PASTE YOUR REAL CONFIG HERE
         const firebaseConfig = {
-       apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
+apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
   databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "aijazideas",
@@ -37,17 +38,20 @@
   appId: "1:822948950064:web:031df081b41175ef3a7df5"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // Switch Logic
-        window.switchTab = (tab) => {
-            if(tab === 'marathon') renderMarathon(db);
-            if(tab === 'ideas') renderIdeas(db);
+        window.loadTab = function(tab) {
+            // Update Active Class
+            document.querySelectorAll('.sidebar li').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav-' + tab).classList.add('active');
+
+            if (tab === 'marathon') renderMarathon(db);
+            if (tab === 'ideas') renderIdeas(db);
         };
 
         // Load Marathon by default
-        renderMarathon(db);
+        window.onload = () => loadTab('marathon');
     </script>
 </body>
 </html>
