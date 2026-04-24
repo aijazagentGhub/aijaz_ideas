@@ -1,10 +1,15 @@
 export function renderMarathon(db) {
     const container = document.getElementById('content-area');
     container.innerHTML = `
-        <div class="upcoming-banner">Upcoming event! : 26/04/2026, TCS 10K</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="font-size:28px;">Marathon Tracker</h2>
-            <button style="background:#2196f3; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer;">+ Add Race</button>
+        <div class="banner-wrapper" style="text-align:center;">
+            <div class="upcoming-banner">Upcoming event! : 26/04/2026, TCS 10K</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h2 style="margin:0; font-size:26px;">Marathon Tracker</h2>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-primary">+ Add Race</button>
+                <button class="btn-secondary">Export CSV</button>
+            </div>
         </div>
         <div class="stats-grid">
             <div class="stat-card"><h5>COMPLETED</h5><h2 id="val-comp">0</h2></div>
@@ -14,12 +19,21 @@ export function renderMarathon(db) {
         </div>
         <table>
             <thead>
-                <tr><th>Marathon Name</th><th>Distance</th><th>Date</th><th>Status</th><th>Location</th><th>Paid (₹)</th></tr>
+                <tr>
+                    <th>Marathon Name</th>
+                    <th>Distance (KM)</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>Paid (₹)</th>
+                    <th>Action</th>
+                </tr>
             </thead>
             <tbody id="marathon-rows"></tbody>
         </table>
     `;
 
+    // Connect to your real data
     db.ref('aijaz_ideas/marathons').on('value', (snapshot) => {
         const data = snapshot.val();
         const tbody = document.getElementById('marathon-rows');
@@ -38,11 +52,12 @@ export function renderMarathon(db) {
                 tbody.innerHTML += `
                     <tr>
                         <td>${r.name}</td>
-                        <td>${r.distance} KM</td>
+                        <td>${r.distance}</td>
                         <td>${r.date}</td>
                         <td><span class="status-${r.status.toLowerCase()}">${r.status}</span></td>
                         <td>${r.location}</td>
                         <td>${r.paid}</td>
+                        <td style="color:red; cursor:pointer; text-align:center;">×</td>
                     </tr>`;
             });
             document.getElementById('val-comp').innerText = comp;
