@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FLUXION</title>
+    <title>FLUXION - Personal Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="main-container">
         <div class="sidebar">
-            <h1>FLUXION</h1>
+            <h1 class="logo">FLUXION</h1>
             <ul>
-                <li onclick="loadTab('marathon')" id="nav-marathon" class="active">🏃 Marathon Tracker</li>
-                <li onclick="loadTab('ideas')" id="nav-ideas">💡 Idea Vault</li>
-                <li onclick="loadTab('expenses')" id="nav-expenses">💰 Daily Expenses</li>
+                <li onclick="loadTab('marathon')" id="nav-marathon" class="active"><span>🏃</span> Marathon Tracker</li>
+                <li onclick="loadTab('ideas')" id="nav-ideas"><span>💡</span> Idea Vault</li>
+                <li onclick="loadTab('expenses')" id="nav-expenses"><span>💰</span> Daily Expenses</li>
             </ul>
         </div>
+
         <div id="content-area" class="main-content">
             </div>
     </div>
@@ -24,9 +25,8 @@
 
     <script type="module">
         import { renderMarathon } from './marathon.js';
-        import { renderIdeas } from './ideas.js';
 
-        // REPLACE THIS SECTION WITH YOUR ACTUAL FIREBASE CONFIG FROM YOUR BACKUP
+        // 1. YOUR FIREBASE CONFIG (Copy from your backup file)
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -40,17 +40,19 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
+        // 2. Tab Switcher
         window.loadTab = function(tab) {
             document.querySelectorAll('.sidebar li').forEach(el => el.classList.remove('active'));
             document.getElementById('nav-' + tab).classList.add('active');
 
-            if (tab === 'marathon') renderMarathon(db);
-            if (tab === 'ideas') {
-                document.getElementById('content-area').innerHTML = '<h2>💡 Idea Vault</h2><p>Ready to start capturing ideas!</p>';
+            if (tab === 'marathon') {
+                renderMarathon(db);
+            } else {
+                document.getElementById('content-area').innerHTML = `<h2 style="color:#1a237e;">${tab.toUpperCase()}</h2><p>Working on this tab next!</p>`;
             }
         };
 
-        // Load Marathon by default
+        // 3. Load Marathon by default
         window.onload = () => loadTab('marathon');
     </script>
 </body>
