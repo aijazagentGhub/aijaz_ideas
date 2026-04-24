@@ -91,17 +91,40 @@
     <div class="sidebar" id="sidebar">
         <button class="toggle-btn" onclick="toggleSidebar()">↔</button>
         <div class="logo">FLUXION</div>
-        <nav>
-            <a href="#" class="nav-link"><span>🏃</span><span class="nav-text">Marathon Tracker</span></a>
-        </nav>
+<nav id="sidebar-nav">
+    <li onclick="showPage('marathon')" id="nav-marathon" class="active" style="display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px;">
+        <span>🏃</span><span class="nav-text" style="margin-left: 10px;">Marathon Tracker</span>
+    </li>
+    <li onclick="showPage('ideas')" id="nav-ideas" style="display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px;">
+        <span>💡</span><span class="nav-text" style="margin-left: 10px;">Idea Vault</span>
+    </li>
+    <li onclick="addNewPage()" style="display: flex; align-items: center; padding: 10px; cursor: pointer; color: #4caf50; font-weight: bold;">
+        <span>➕</span><span class="nav-text" style="margin-left: 10px;">Add Page</span>
+    </li>
+</nav>
     </div>
 
-    <div class="main-pane">
+<div class="main-pane">
+    <div id="page-marathon" class="content-page">
         <div class="banner-container">
             <div class="upcoming-banner" id="upcomingBanner" style="display: none;">
                 Upcoming event! : <span id="bannerContent">...</span>
             </div>
         </div>
+        
+        </div>
+
+    <div id="page-ideas" class="content-page" style="display: none;">
+        <h2 style="margin-top: 20px; color: #1a237e;">💡 Idea Vault</h2>
+        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <p style="color: #666;">What's your next big idea?</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+            <textarea placeholder="Type your idea here..." style="width: 100%; height: 150px; border: 1px solid #ddd; border-radius: 10px; padding: 15px; font-family: inherit;"></textarea>
+            <br><br>
+            <button style="background: #1a237e; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Save Idea</button>
+        </div>
+    </div>
+</div>
 
         <div class="header-row">
             <h1>Marathon Tracker</h1>
@@ -298,5 +321,18 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         loadData();
     </script>
+    <script>
+function showTab(tabId) {
+    // 1. Hide all pages
+    document.getElementById('page-marathon').style.display = 'none';
+    document.getElementById('page-ideas').style.display = 'none';
+    
+    // 2. Show the specific page you clicked
+    document.getElementById('page-' + tabId).style.display = 'block';
+    
+    // 3. Optional: Add 'active' look to the sidebar link
+    console.log("Switched to: " + tabId);
+}
+</script>
 </body>
 </html>
