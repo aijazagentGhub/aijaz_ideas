@@ -1,0 +1,77 @@
+        :root {
+            --primary-blue: #2563eb;
+            --ice-blue: #e0f2fe;
+            --alert-red: #dc2626;
+            --row-alt: #f8fafc;   
+            --border-color: #cbd5e1;
+            --color-completed: #16a34a;
+            --color-pending: #ca8a04;
+            --color-missed: #dc2626;
+            --header-teal: #008080;
+        }
+
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s ease; position: relative; }
+        .sidebar.collapsed { width: 60px; padding: 20px 10px; }
+        .sidebar.collapsed .logo, .sidebar.collapsed .nav-text { display: none; }
+        .logo { font-weight: 800; color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 30px; white-space: nowrap; }
+        .toggle-btn { position: absolute; top: 20px; right: -15px; background: var(--primary-blue); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 10; font-weight: bold; }
+        .nav-link { text-decoration: none; color: var(--primary-blue); font-weight: 600; padding: 12px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; gap: 10px; }
+
+        /* --- MAIN CONTENT --- */
+        .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
+        
+        /* --- BANNER --- */
+        @keyframes blinker { 50% { opacity: 0.3; } }
+        .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; }
+        .upcoming-banner { 
+            background: var(--ice-blue); 
+            color: #1e293b; 
+            padding: 12px 25px; 
+            border-radius: 50px; 
+            display: inline-block;
+            border: 3px solid var(--alert-red);
+            text-align: center;
+            font-weight: 800;
+            animation: blinker 0.6s linear 5;
+        }
+
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
+        .header-row h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #334155; }
+
+        .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
+        .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
+
+        /* --- TABLES --- */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
+        td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
+        
+        tbody tr:nth-child(even) { background-color: var(--row-alt); }
+        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
+
+        /* --- STATUS COLORS --- */
+        .status-Completed select, .val-completed { color: var(--color-completed) !important; font-weight: 800; }
+        .status-Pending select, .val-pending { color: var(--color-pending) !important; font-weight: 800; }
+        .status-Missed select, .val-missed { color: var(--color-missed) !important; font-weight: 800; }
+
+        input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+        .btn-new { background: var(--primary-blue); color: white; }
+        .btn-csv { background: var(--header-teal); color: white; margin-left: 5px; }
+
+        .pagination { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 30px; }
+        .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
+        .page-btn.active { background: var(--primary-blue); color: white; }
+
+        .yearly-table td { text-align: center; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-pane { padding: 15px; }
+        }
