@@ -1,40 +1,54 @@
 export function renderIdeas(db) {
-    const mainContainer = document.getElementById('content-area');
-    mainContainer.innerHTML = `
-        <div class="card">
-            <h2>💡 Idea Vault</h2>
-            <div class="input-group" style="margin-bottom: 20px;">
-                <input type="text" id="new-idea" placeholder="Enter a new idea..." style="width: 70%; padding: 10px;">
-                <button id="add-idea-btn" class="btn-primary">Add Idea</button>
-            </div>
-            <div id="ideas-list"></div>
+    const container = document.getElementById('content-area');
+    
+    container.innerHTML = `
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #1a237e;">💡 Idea Vault</h2>
+            <button id="add-idea-btn" style="background-color: #2196F3; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">+ Add Idea</button>
         </div>
+
+        <div id="idea-form" class="card" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px;">
+            <input type="text" id="idea-title" placeholder="Idea Title" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <textarea id="idea-desc" placeholder="Describe your thought..." style="width: 100%; padding: 10px; height: 80px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+            <button id="save-idea-btn" style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px;">Save to Firebase</button>
+        </div>
+
+        <div id="ideas-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            </div>
     `;
 
-    const btn = document.getElementById('add-idea-btn');
-    const input = document.getElementById('new-idea');
+    // UI Logic: Show/Hide Form
+    const addBtn = document.getElementById('add-idea-btn');
+    const form = document.getElementById('idea-form');
+    addBtn.onclick = () => form.style.display = form.style.display === 'none' ? 'block' : 'none';
 
-    // Save Logic
-    btn.onclick = () => {
-        if (input.value.trim() !== "") {
+    // Firebase Logic: Save
+    document.getElementById('save-idea-btn').onclick = () => {
+        const title = document.getElementById('idea-title').value;
+        const desc = document.getElementById('idea-desc').value;
+        if (title) {
             db.ref('aijaz_ideas/vault').push({
-                content: input.value,
-                timestamp: new Date().toLocaleString()
+                title,
+                desc,
+                date: new Date().toLocaleDateString()
             });
-            input.value = "";
+            document.getElementById('idea-title').value = '';
+            document.getElementById('idea-desc').value = '';
+            form.style.display = 'none';
         }
     };
 
-    // Real-time Display Logic
+    // Firebase Logic: Read
     db.ref('aijaz_ideas/vault').on('value', (snapshot) => {
-        const list = document.getElementById('ideas-list');
-        list.innerHTML = "";
+        const grid = document.getElementById('ideas-grid');
+        grid.innerHTML = '';
         snapshot.forEach(child => {
             const data = child.val();
-            list.innerHTML += `
-                <div style="padding: 10px; border-bottom: 1px solid #eee;">
-                    <p><strong>${data.content}</strong></p>
-                    <small>${data.timestamp}</small>
+            grid.innerHTML += `
+                <div class="card" style="background: white; padding: 15px; border-radius: 10px; border-left: 5px solid #2196F3; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0; color: #333;">${data.title}</h3>
+                    <p style="color: #666; font-size: 0.9em;">${data.desc}</p>
+                    <small style="color: #999;">${data.date}</small>
                 </div>
             `;
         });
