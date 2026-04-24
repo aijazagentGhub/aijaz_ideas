@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FLUXION - Personal Hub</title>
+    <title>FLUXION</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="main-container">
         <div class="sidebar">
-            <h1 class="logo">FLUXION</h1>
+            <h1>FLUXION</h1>
             <ul>
-                <li onclick="loadTab('marathon')" id="nav-marathon">🏃 Marathon Tracker</li>
+                <li onclick="loadTab('marathon')" id="nav-marathon" class="active">🏃 Marathon Tracker</li>
                 <li onclick="loadTab('ideas')" id="nav-ideas">💡 Idea Vault</li>
                 <li onclick="loadTab('expenses')" id="nav-expenses">💰 Daily Expenses</li>
             </ul>
         </div>
-
         <div id="content-area" class="main-content">
             </div>
     </div>
@@ -27,7 +26,7 @@
         import { renderMarathon } from './marathon.js';
         import { renderIdeas } from './ideas.js';
 
-        // PASTE YOUR REAL CONFIG HERE
+        // REPLACE THIS SECTION WITH YOUR ACTUAL FIREBASE CONFIG FROM YOUR BACKUP
         const firebaseConfig = {
 apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
@@ -42,12 +41,13 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
         const db = firebase.database();
 
         window.loadTab = function(tab) {
-            // Update Active Class
             document.querySelectorAll('.sidebar li').forEach(el => el.classList.remove('active'));
             document.getElementById('nav-' + tab).classList.add('active');
 
             if (tab === 'marathon') renderMarathon(db);
-            if (tab === 'ideas') renderIdeas(db);
+            if (tab === 'ideas') {
+                document.getElementById('content-area').innerHTML = '<h2>💡 Idea Vault</h2><p>Ready to start capturing ideas!</p>';
+            }
         };
 
         // Load Marathon by default
