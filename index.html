@@ -2,46 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLUXION - Personal Hub</title>
-    
-    <link rel="stylesheet" href="style.css">
+    <title>FLUXION</title>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
-
-    <div class="main-wrapper" style="display: flex; min-height: 100vh;">
-        
-        <div class="sidebar" style="width: 260px; background-color: #1a237e; color: white; padding: 20px;">
-            <h1 class="logo" style="font-family: sans-serif; letter-spacing: 2px; margin-bottom: 40px;">FLUXION</h1>
-            <nav>
-                <ul style="list-style: none; padding: 0;">
-                    <li onclick="loadTab('marathon')" style="padding: 15px 10px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                        <span>🏃</span> Marathon Tracker
-                    </li>
-                    <li onclick="loadTab('ideas')" style="padding: 15px 10px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                        <span>💡</span> Idea Vault
-                    </li>
-                    <li onclick="loadTab('expenses')" style="padding: 15px 10px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                        <span>💰</span> Daily Expenses
-                    </li>
-                </ul>
-            </nav>
+    <div class="app-layout" style="display: flex; min-height: 100vh;">
+        <div class="sidebar" style="width: 250px; background: #1a237e; color: white;">
+            <h1 style="padding: 20px;">FLUXION</h1>
+            <ul style="list-style: none; padding: 0;">
+                <li onclick="switchTab('marathon')" style="padding: 20px; cursor: pointer;">🏃 Marathon Tracker</li>
+                <li onclick="switchTab('ideas')" style="padding: 20px; cursor: pointer;">💡 Idea Vault</li>
+            </ul>
         </div>
 
-        <main id="content-area" style="flex: 1; background-color: #f8f9fa; padding: 40px;">
-            </main>
+        <div id="content-area" style="flex: 1; padding: 20px; background: #f4f7f6;">
+            </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script type="module">
+        import { renderMarathon } from './marathon.js';
         import { renderIdeas } from './ideas.js';
-        // import { renderMarathon } from './marathon.js'; 
 
         // PASTE YOUR REAL FIREBASE CONFIG HERE
         const firebaseConfig = {
-         apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
+       apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
   authDomain: "aijazideas.firebaseapp.com",
   databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "aijazideas",
@@ -50,45 +37,17 @@
   appId: "1:822948950064:web:031df081b41175ef3a7df5"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // FUNCTION TO LOAD TABS
-        window.loadTab = function(tabName) {
-            const container = document.getElementById('content-area');
-            
-            if (tabName === 'ideas') {
-                renderIdeas(db);
-            } else if (tabName === 'marathon') {
-                // For now, let's just trigger your original data fetch logic
-                loadMarathonData(); 
-            }
+        // Switch Logic
+        window.switchTab = (tab) => {
+            if(tab === 'marathon') renderMarathon(db);
+            if(tab === 'ideas') renderIdeas(db);
         };
 
-        // INITIAL LOAD
-        window.onload = () => loadTab('marathon');
-
-        function loadMarathonData() {
-            const container = document.getElementById('content-area');
-            // Restore the HTML structure your CSS expects
-            container.innerHTML = `
-                <div class="header-row" style="display:flex; justify-content:space-between;">
-                    <h2>Marathon Tracker</h2>
-                    <button class="btn-add">+ Add Race</button>
-                </div>
-                <div id="marathon-list-container">
-                    </div>
-            `;
-            
-            // Re-run your original Firebase 'on value' code here
-            db.ref('aijaz_ideas/marathons').on('value', (snapshot) => {
-                const data = snapshot.val();
-                console.log("Marathon Data Loaded:", data);
-                // CODE TO GENERATE YOUR TABLE ROWS GOES HERE
-            });
-        }
+        // Load Marathon by default
+        renderMarathon(db);
     </script>
 </body>
 </html>
