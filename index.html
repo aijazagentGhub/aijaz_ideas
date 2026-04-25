@@ -20,7 +20,6 @@
 
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
         .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s ease; position: relative; }
         .sidebar.collapsed { width: 60px; padding: 20px 10px; }
         .sidebar.collapsed .logo, .sidebar.collapsed .nav-text { display: none; }
@@ -28,68 +27,34 @@
         .toggle-btn { position: absolute; top: 20px; right: -15px; background: var(--primary-blue); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 10; font-weight: bold; }
         .nav-link { text-decoration: none; color: var(--primary-blue); font-weight: 600; padding: 12px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; gap: 10px; }
 
-        /* --- MAIN CONTENT --- */
         .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
         
-        /* --- BANNER --- */
-        @keyframes blinker { 50% { opacity: 0.3; } }
-        .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; min-height: 50px; }
-        .upcoming-banner { 
-            background: var(--ice-blue); 
-            color: #1e293b; 
-            padding: 12px 25px; 
-            border-radius: 50px; 
-            display: inline-block;
-            border: 3px solid var(--alert-red);
-            text-align: center;
-            font-weight: 800;
-            animation: blinker 0.6s linear 5;
-        }
-
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .header-row h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #334155; }
 
         .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
-        /* --- TABLES --- */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
-        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
 
-        .status-Completed select { color: var(--color-completed) !important; font-weight: 800; }
-        .status-Pending select { color: var(--color-pending) !important; font-weight: 800; }
-        .status-Missed select { color: var(--color-missed) !important; font-weight: 800; }
+        /* --- CERTIFICATE AREA --- */
+        .cert-group { display: flex; align-items: center; gap: 5px; }
+        .cert-name-box { flex-grow: 1; border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; font-size: 10px; background: #fff; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+        .btn-cta { padding: 5px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; }
+        .up-cta { background: #64748b; color: white; }
+        .down-cta { background: var(--primary-blue); color: white; }
 
-        input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
-        .editable:empty:before { content: attr(data-placeholder); color: #cbd5e1; font-weight: 400; }
-
-        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
-        .btn-new { background: var(--primary-blue); color: white; }
-        .btn-csv { background: var(--header-teal); color: white; margin-left: 5px; }
-
-        /* --- CERTIFICATE CTA --- */
-        .cert-actions { display: flex; gap: 8px; align-items: center; }
-        .btn-action { padding: 4px 8px; border-radius: 4px; font-size: 11px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; }
-        .btn-up { background: #cbd5e1; color: #334155; }
-        .btn-down { background: var(--primary-blue); color: white; }
-
-        .pagination { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 30px; }
-        .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
-        .page-btn.active { background: var(--primary-blue); color: white; }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-pane { padding: 15px; }
-        }
+        .status-Completed select { color: var(--color-completed); font-weight: 800; }
+        .status-Pending select { color: var(--color-pending); font-weight: 800; }
+        .status-Missed select { color: var(--color-missed); font-weight: 800; }
+        
+        input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; }
     </style>
 </head>
 <body>
@@ -101,24 +66,16 @@
     </div>
 
     <div class="main-pane">
-        <div class="banner-container">
-            <div class="upcoming-banner" id="upcomingBanner" style="display: none;">
-                Upcoming event! : <span id="bannerContent">...</span>
-            </div>
-        </div>
-
         <div class="header-row">
             <h1>Marathon Tracker</h1>
             <div>
-                <button class="btn btn-new" onclick="addNewRow()">+ Add Race</button>
-                <button class="btn btn-csv" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn btn-new" style="background: var(--primary-blue); color:white; padding: 8px 16px; border-radius: 8px; border:none; cursor:pointer; font-weight:700;" onclick="addNewRow()">+ Add Race</button>
             </div>
         </div>
 
         <div class="summary-bar">
             <div class="stat-card"><h3>Completed</h3><p id="stat-completed" style="color:var(--color-completed)">0</p></div>
             <div class="stat-card"><h3>Pending</h3><p id="stat-pending" style="color:var(--color-pending)">0</p></div>
-            <div class="stat-card"><h3>Missed</h3><p id="stat-missed" style="color:var(--color-missed)">0</p></div>
             <div class="stat-card"><h3>Total Paid ₹</h3><p id="stat-total-paid">0</p></div>
         </div>
 
@@ -127,29 +84,15 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 80px;">KM</th>
-                        <th style="width: 130px;">Date</th>
-                        <th style="width: 120px;">Status</th>
-                        <th>Location</th>
+                        <th style="width: 60px;">KM</th>
+                        <th style="width: 120px;">Date</th>
+                        <th style="width: 110px;">Status</th>
                         <th style="width: 100px;">Paid (₹)</th>
-                        <th style="width: 100px;">Time Taken</th>
-                        <th style="width: 180px;">Certificate</th>
-                        <th style="width: 50px; text-align: center;">X</th>
+                        <th style="width: 250px;">Certificate Reference</th>
+                        <th style="width: 40px;">X</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-
-        <div class="pagination" id="paginationControls"></div>
-
-        <div class="yearly-container">
-            <table>
-                <thead>
-                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue);">YEARLY PERFORMANCE BREAKDOWN</th></tr>
-                    <tr><th>Year</th><th>Total Runs</th><th>Completed</th><th>Pending</th><th>Missed</th><th>Total Investment (₹)</th></tr>
-                </thead>
-                <tbody id="yearlyBody"></tbody>
             </table>
         </div>
     </div>
@@ -173,79 +116,31 @@
         const storage = firebase.storage();
 
         let allItems = [];
-        let currentPage = 1;
-        const rowsPerPage = 10;
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
         async function handleUpload(id, file) {
             if (!file) return;
-            const btn = document.getElementById(`up-${id}`);
-            btn.innerText = "WAIT...";
-            const ref = storage.ref(`certs/${id}/${Date.now()}_${file.name}`);
-            try {
-                const snap = await ref.put(file);
-                const url = await snap.ref.getDownloadURL();
-                await db.ref('marathons/' + id).update({ certUrl: url });
-            } catch (e) { alert("Upload error."); }
-            btn.innerText = "UPLOAD";
-        }
-
-        async function triggerDownload(url, name) {
-            try {
-                const res = await fetch(url);
-                const blob = await res.blob();
-                const bUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = bUrl;
-                a.download = `${name}_Certificate.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            } catch (e) { window.open(url, '_blank'); }
-        }
-
-        function updateStats(items) {
-            let comp = 0, pend = 0, miss = 0, total = 0, yearlyData = {}, upcoming = null;
-            items.forEach(item => {
-                const s = item.status || 'Pending';
-                const amt = parseFloat(item.amount) || 0;
-                if (s === 'Completed') comp++; else if (s === 'Missed') miss++; else { pend++; if (!upcoming && item.date) upcoming = item; }
-                total += amt;
-                if (item.date) {
-                    const year = new Date(item.date).getFullYear();
-                    if (!isNaN(year)) {
-                        if (!yearlyData[year]) yearlyData[year] = { count: 0, comp: 0, pend: 0, miss: 0, paid: 0 };
-                        yearlyData[year].count++;
-                        const key = s === 'Completed' ? 'comp' : (s === 'Missed' ? 'miss' : 'pend');
-                        yearlyData[year][key]++;
-                        yearlyData[year].paid += amt;
-                    }
-                }
-            });
-            const banner = document.getElementById('upcomingBanner');
-            if (upcoming) { banner.style.display = 'inline-block'; document.getElementById('bannerContent').innerText = `${upcoming.name} (${upcoming.date})`; }
-            else banner.style.display = 'none';
-
-            document.getElementById('stat-completed').innerText = comp;
-            document.getElementById('stat-pending').innerText = pend;
-            document.getElementById('stat-missed').innerText = miss;
-            document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
+            const btn = document.getElementById(`up-btn-${id}`);
+            btn.innerText = "...";
             
-            const yBody = document.getElementById('yearlyBody');
-            yBody.innerHTML = "";
-            Object.keys(yearlyData).sort((a,b) => b-a).forEach(year => {
-                const yd = yearlyData[year];
-                yBody.innerHTML += `<tr><td><strong>${year}</strong></td><td>${yd.count}</td><td>${yd.comp}</td><td>${yd.pend}</td><td>${yd.miss}</td><td>₹ ${yd.paid.toLocaleString('en-IN')}</td></tr>`;
-            });
+            const storageRef = storage.ref(`certs/${id}/${file.name}`);
+            try {
+                const snapshot = await storageRef.put(file);
+                const url = await snapshot.ref.getDownloadURL();
+                // We save both the URL and the original filename
+                await db.ref('marathons/' + id).update({ 
+                    certUrl: url,
+                    certFileName: file.name 
+                });
+            } catch (e) { alert("Upload failed."); }
+            btn.innerText = "UPLOAD";
         }
 
         function renderTable() {
             const tableBody = document.getElementById("tableBody");
             tableBody.innerHTML = "";
-            const paginated = allItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-            
-            paginated.forEach(item => {
+            allItems.forEach(item => {
                 const row = document.createElement("tr");
                 const status = item.status || 'Pending';
                 row.innerHTML = `
@@ -255,65 +150,49 @@
                     <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)">
                         <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
                         <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
-                        <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
                     </select></td>
-                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || ''}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
-                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div></td>
                     <td>
-                        <div class="cert-actions">
-                            <button class="btn-action btn-up" id="up-${item.id}" onclick="document.getElementById('file-${item.id}').click()">Upload</button>
-                            <input type="file" id="file-${item.id}" style="display:none" onchange="handleUpload('${item.id}', this.files[0])">
-                            ${item.certUrl ? `<button class="btn-action btn-down" onclick="triggerDownload('${item.certUrl}', '${item.name}')">Download</button>` : ''}
+                        <div class="cert-group">
+                            <div class="cert-name-box" title="${item.certFileName || 'No file'}">
+                                ${item.certFileName || 'No file uploaded'}
+                            </div>
+                            <button class="btn-cta up-cta" id="up-btn-${item.id}" onclick="document.getElementById('file-${item.id}').click()">Upload</button>
+                            <input type="file" id="file-${item.id}" style="display:none" accept="application/pdf" onchange="handleUpload('${item.id}', this.files[0])">
+                            
+                            ${item.certUrl ? `<button class="btn-cta down-cta" onclick="window.open('${item.certUrl}', '_blank')">Download</button>` : ''}
                         </div>
                     </td>
-                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
+                    <td><button style="color:red; cursor:pointer; background:none; border:none;" onclick="deleteFromDB('${item.id}')">×</button></td>
                 `;
                 tableBody.appendChild(row);
             });
-            renderPagination();
         }
 
         function loadData() {
             db.ref('marathons').on('value', (s) => {
                 const data = s.val();
-                if (!data) { allItems = []; renderTable(); return; }
-                allItems = Object.keys(data).map(k => ({ id: k, ...data[k] }));
-                allItems.sort((a, b) => {
-                    const priority = { 'Pending': 1, 'Completed': 2, 'Missed': 3 };
-                    const pA = priority[a.status || 'Pending']; const pB = priority[b.status || 'Pending'];
-                    if (pA !== pB) return pA - pB;
-                    return new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31');
+                allItems = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                
+                // Stats calc
+                let comp = 0, pend = 0, total = 0;
+                allItems.forEach(i => {
+                    if(i.status === 'Completed') comp++; else pend++;
+                    total += parseFloat(i.amount || 0);
                 });
-                updateStats(allItems);
+                document.getElementById('stat-completed').innerText = comp;
+                document.getElementById('stat-pending').innerText = pend;
+                document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
+
                 renderTable();
             });
         }
 
         function addNewRow() {
-            const today = new Date().toISOString().split('T')[0];
-            db.ref('marathons').push({ name: "New Race", distance: "10", date: today, status: "Pending", location: "Bangalore", amount: 0, timeTaken: "00:00" });
+            db.ref('marathons').push({ name: "New Race", distance: "10", date: new Date().toISOString().split('T')[0], status: "Pending", amount: 0 });
         }
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
         function deleteFromDB(id) { if(confirm("Delete?")) db.ref('marathons/' + id).remove(); }
-        function renderPagination() {
-            const controls = document.getElementById("paginationControls");
-            controls.innerHTML = "";
-            const pageCount = Math.ceil(allItems.length / rowsPerPage);
-            for (let i = 1; i <= pageCount; i++) {
-                const btn = document.createElement("button");
-                btn.innerText = i; btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                btn.onclick = () => { currentPage = i; renderTable(); };
-                controls.appendChild(btn);
-            }
-        }
-        function exportToCSV() {
-            let csv = "Name,KM,Date,Status,Location,Amount,Time\n";
-            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.timeTaken}"\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'Marathons.csv'; a.click();
-        }
 
         loadData();
     </script>
