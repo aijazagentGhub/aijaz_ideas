@@ -54,7 +54,6 @@
         .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
-        /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
         
@@ -80,9 +79,12 @@
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        .upload-wrapper { display: flex; flex-direction: column; gap: 4px; }
-        .file-input { font-size: 0.7rem; color: #64748b; }
-        .view-link { font-size: 0.7rem; color: var(--primary-blue); text-decoration: none; font-weight: 700; border: 1px solid var(--primary-blue); padding: 1px 4px; border-radius: 3px; display: inline-block; width: fit-content; }
+        /* --- CERTIFICATE ACTIONS --- */
+        .cert-actions { display: flex; align-items: center; gap: 15px; }
+        .icon-btn { cursor: pointer; font-size: 1.2rem; transition: transform 0.2s; border: none; background: none; padding: 0; }
+        .icon-btn:hover { transform: scale(1.2); }
+        .download-btn { color: var(--primary-blue); text-decoration: none; display: flex; align-items: center; }
+        .upload-label { color: #64748b; display: flex; align-items: center; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -133,7 +135,7 @@
                         <th>Location</th>
                         <th style="width: 100px;">Paid (₹)</th>
                         <th style="width: 100px;">Time Taken</th>
-                        <th style="width: 180px;">Certificate (PDF)</th>
+                        <th style="width: 120px;">Certificate</th>
                         <th style="width: 50px; text-align: center;">X</th>
                     </tr>
                 </thead>
@@ -186,8 +188,13 @@
             try {
                 const snap = await ref.put(file);
                 const url = await snap.ref.getDownloadURL();
-                updateDB(id, 'certUrl', url);
-            } catch (e) { alert("Upload error."); }
+                // FIX: Update the specific record in DB so it persists on refresh
+                await db.ref('marathons/' + id).update({ certUrl: url });
+                alert("Upload Successful!");
+            } catch (e) { 
+                console.error(e);
+                alert("Upload failed. Ensure Storage rules allow uploads."); 
+            }
         }
 
         function updateStats(items) {
@@ -202,7 +209,6 @@
                 else if (s === 'Missed') miss++; 
                 else {
                     pend++;
-                    // Identify the very first Pending race for the banner
                     if (!upcoming && item.date) upcoming = item;
                 }
                 
@@ -219,7 +225,6 @@
                 }
             });
 
-            // Update Banner
             const banner = document.getElementById('upcomingBanner');
             if (upcoming) {
                 document.getElementById('bannerContent').innerText = `${upcoming.name} (${upcoming.date})`;
@@ -262,9 +267,12 @@
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
                     <td><div class="editable" contenteditable="true" data-placeholder="00:00" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div></td>
                     <td>
-                        <div class="upload-wrapper">
-                            <input type="file" class="file-input" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0])">
-                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="view-link">View PDF ↗</a>` : ''}
+                        <div class="cert-actions">
+                            <label class="icon-btn upload-label" title="Upload Certificate">
+                                ⬆️
+                                <input type="file" style="display:none" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0])">
+                            </label>
+                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="icon-btn download-btn" title="Download Certificate">⬇️</a>` : ''}
                         </div>
                     </td>
                     <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
@@ -281,20 +289,14 @@
                 
                 allItems = Object.keys(data).map(k => ({ id: k, ...data[k] }));
 
-                // Priority Sorting: Pending (Asc Date) > Completed (Asc Date) > Missed (Asc Date)
                 allItems.sort((a, b) => {
                     const statusA = (a.status || 'Pending');
                     const statusB = (b.status || 'Pending');
                     const priority = { 'Pending': 1, 'Completed': 2, 'Missed': 3 };
-                    
                     const pA = priority[statusA] || 1;
                     const pB = priority[statusB] || 1;
-
                     if (pA !== pB) return pA - pB;
-
-                    const dateA = new Date(a.date || '9999-12-31');
-                    const dateB = new Date(b.date || '9999-12-31');
-                    return dateA - dateB;
+                    return new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31');
                 });
 
                 updateStats(allItems);
