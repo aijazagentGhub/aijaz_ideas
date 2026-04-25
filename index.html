@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Aijaz</title>
+    <title>Marathon Tracker - Fluxion Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -54,31 +54,42 @@
         .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
+        /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
         
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
+        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
 
-        /* --- CERTIFICATE CTA STYLES --- */
-        .cert-cell { display: flex; gap: 6px; align-items: center; }
-        .cta-btn { padding: 6px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; border: none; font-weight: 800; text-transform: uppercase; transition: 0.2s; }
-        .cta-up { background: #64748b; color: white; }
-        .cta-down { background: var(--primary-blue); color: white; }
-        .cta-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+        .status-Completed select { color: var(--color-completed) !important; font-weight: 800; }
+        .status-Pending select { color: var(--color-pending) !important; font-weight: 800; }
+        .status-Missed select { color: var(--color-missed) !important; font-weight: 800; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
-        .status-Completed select { color: var(--color-completed); font-weight: 800; }
-        .status-Pending select { color: var(--color-pending); font-weight: 800; }
-        .status-Missed select { color: var(--color-missed); font-weight: 800; }
+        .editable:empty:before { content: attr(data-placeholder); color: #cbd5e1; font-weight: 400; }
+
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+        .btn-new { background: var(--primary-blue); color: white; }
+        .btn-csv { background: var(--header-teal); color: white; margin-left: 5px; }
+
+        /* --- CERTIFICATE CTA --- */
+        .cert-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-action { padding: 4px 8px; border-radius: 4px; font-size: 11px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        .btn-up { background: #cbd5e1; color: #334155; }
+        .btn-down { background: var(--primary-blue); color: white; }
 
         .pagination { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 30px; }
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; overflow: hidden; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-pane { padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -99,8 +110,8 @@
         <div class="header-row">
             <h1>Marathon Tracker</h1>
             <div>
-                <button class="btn-new btn" onclick="addNewRow()">+ Add Race</button>
-                <button class="btn-csv btn" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn btn-new" onclick="addNewRow()">+ Add Race</button>
+                <button class="btn btn-csv" onclick="exportToCSV()">Export CSV</button>
             </div>
         </div>
 
@@ -116,14 +127,14 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 60px;">KM</th>
+                        <th style="width: 80px;">KM</th>
                         <th style="width: 130px;">Date</th>
-                        <th style="width: 110px;">Status</th>
+                        <th style="width: 120px;">Status</th>
                         <th>Location</th>
                         <th style="width: 100px;">Paid (₹)</th>
                         <th style="width: 100px;">Time Taken</th>
                         <th style="width: 180px;">Certificate</th>
-                        <th style="width: 40px; text-align: center;">X</th>
+                        <th style="width: 50px; text-align: center;">X</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -169,39 +180,29 @@
 
         async function handleUpload(id, file) {
             if (!file) return;
-            const btn = document.getElementById(`up-btn-${id}`);
-            const originalText = btn.innerText;
-            btn.innerText = "⏳ ...";
-            
-            const storageRef = storage.ref(`certificates/${id}/${Date.now()}_${file.name}`);
+            const btn = document.getElementById(`up-${id}`);
+            btn.innerText = "WAIT...";
+            const ref = storage.ref(`certs/${id}/${Date.now()}_${file.name}`);
             try {
-                const snapshot = await storageRef.put(file);
-                const url = await snapshot.ref.getDownloadURL();
+                const snap = await ref.put(file);
+                const url = await snap.ref.getDownloadURL();
                 await db.ref('marathons/' + id).update({ certUrl: url });
-                alert("Upload Successful!");
-            } catch (e) { 
-                console.error(e);
-                alert("Upload Failed. Check Storage permissions."); 
-            } finally {
-                btn.innerText = originalText;
-            }
+            } catch (e) { alert("Upload error."); }
+            btn.innerText = "UPLOAD";
         }
 
-        async function downloadCertificate(url, raceName) {
+        async function triggerDownload(url, name) {
             try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = `${raceName.replace(/\s+/g, '_')}_Certificate.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(blobUrl);
-            } catch (e) {
-                window.open(url, '_blank');
-            }
+                const res = await fetch(url);
+                const blob = await res.blob();
+                const bUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = bUrl;
+                a.download = `${name}_Certificate.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (e) { window.open(url, '_blank'); }
         }
 
         function updateStats(items) {
@@ -260,10 +261,10 @@
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div></td>
                     <td>
-                        <div class="cert-cell">
-                            <button class="cta-btn cta-up" id="up-btn-${item.id}" onclick="document.getElementById('input-${item.id}').click()">Upload</button>
-                            <input type="file" id="input-${item.id}" style="display:none" accept="application/pdf" onchange="handleUpload('${item.id}', this.files[0])">
-                            ${item.certUrl ? `<button class="cta-btn cta-down" onclick="downloadCertificate('${item.certUrl}', '${item.name}')">Download</button>` : ''}
+                        <div class="cert-actions">
+                            <button class="btn-action btn-up" id="up-${item.id}" onclick="document.getElementById('file-${item.id}').click()">Upload</button>
+                            <input type="file" id="file-${item.id}" style="display:none" onchange="handleUpload('${item.id}', this.files[0])">
+                            ${item.certUrl ? `<button class="btn-action btn-down" onclick="triggerDownload('${item.certUrl}', '${item.name}')">Download</button>` : ''}
                         </div>
                     </td>
                     <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
@@ -278,12 +279,9 @@
                 const data = s.val();
                 if (!data) { allItems = []; renderTable(); return; }
                 allItems = Object.keys(data).map(k => ({ id: k, ...data[k] }));
-                
-                // 3-Tier Sorting logic
                 allItems.sort((a, b) => {
                     const priority = { 'Pending': 1, 'Completed': 2, 'Missed': 3 };
-                    const pA = priority[a.status || 'Pending'];
-                    const pB = priority[b.status || 'Pending'];
+                    const pA = priority[a.status || 'Pending']; const pB = priority[b.status || 'Pending'];
                     if (pA !== pB) return pA - pB;
                     return new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31');
                 });
@@ -297,8 +295,7 @@
             db.ref('marathons').push({ name: "New Race", distance: "10", date: today, status: "Pending", location: "Bangalore", amount: 0, timeTaken: "00:00" });
         }
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete this race?")) db.ref('marathons/' + id).remove(); }
-        
+        function deleteFromDB(id) { if(confirm("Delete?")) db.ref('marathons/' + id).remove(); }
         function renderPagination() {
             const controls = document.getElementById("paginationControls");
             controls.innerHTML = "";
@@ -310,7 +307,6 @@
                 controls.appendChild(btn);
             }
         }
-        
         function exportToCSV() {
             let csv = "Name,KM,Date,Status,Location,Amount,Time\n";
             allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.timeTaken}"\n`);
