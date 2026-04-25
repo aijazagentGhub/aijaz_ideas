@@ -31,6 +31,21 @@
         /* --- MAIN CONTENT --- */
         .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
         
+        /* --- BANNER --- */
+        @keyframes blinker { 50% { opacity: 0.3; } }
+        .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; min-height: 50px; }
+        .upcoming-banner { 
+            background: var(--ice-blue); 
+            color: #1e293b; 
+            padding: 12px 25px; 
+            border-radius: 50px; 
+            display: inline-block;
+            border: 3px solid var(--alert-red);
+            text-align: center;
+            font-weight: 800;
+            animation: blinker 0.6s linear 5;
+        }
+
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
         .header-row h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #334155; }
 
@@ -39,13 +54,11 @@
         .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
+        /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
         .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
         
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        .yearly-table { min-width: 100%; table-layout: fixed; }
-
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
@@ -88,6 +101,12 @@
     </div>
 
     <div class="main-pane">
+        <div class="banner-container">
+            <div class="upcoming-banner" id="upcomingBanner" style="display: none;">
+                Upcoming event! : <span id="bannerContent">...</span>
+            </div>
+        </div>
+
         <div class="header-row">
             <h1>Marathon Tracker</h1>
             <div>
@@ -173,22 +192,42 @@
 
         function updateStats(items) {
             let comp = 0, pend = 0, miss = 0, total = 0, yearlyData = {};
+            let upcoming = null;
+
             items.forEach(item => {
-                const s = (item.status || 'Pending').toLowerCase();
+                const s = (item.status || 'Pending');
                 const amt = parseFloat(item.amount) || 0;
-                if (s === 'completed') comp++; else if (s === 'missed') miss++; else pend++;
+                
+                if (s === 'Completed') comp++; 
+                else if (s === 'Missed') miss++; 
+                else {
+                    pend++;
+                    // Identify the very first Pending race for the banner
+                    if (!upcoming && item.date) upcoming = item;
+                }
+                
                 total += amt;
                 if (item.date) {
                     const year = new Date(item.date).getFullYear();
                     if (!isNaN(year)) {
                         if (!yearlyData[year]) yearlyData[year] = { count: 0, comp: 0, pend: 0, miss: 0, paid: 0 };
                         yearlyData[year].count++;
-                        const key = s === 'completed' ? 'comp' : (s === 'missed' ? 'miss' : 'pend');
+                        const key = s === 'Completed' ? 'comp' : (s === 'Missed' ? 'miss' : 'pend');
                         yearlyData[year][key]++;
                         yearlyData[year].paid += amt;
                     }
                 }
             });
+
+            // Update Banner
+            const banner = document.getElementById('upcomingBanner');
+            if (upcoming) {
+                document.getElementById('bannerContent').innerText = `${upcoming.name} (${upcoming.date})`;
+                banner.style.display = 'inline-block';
+            } else {
+                banner.style.display = 'none';
+            }
+
             document.getElementById('stat-completed').innerText = comp;
             document.getElementById('stat-pending').innerText = pend;
             document.getElementById('stat-missed').innerText = miss;
@@ -235,7 +274,6 @@
             renderPagination();
         }
 
-        /* --- THREE-TIER SORTING LOGIC --- */
         function loadData() {
             db.ref('marathons').on('value', (s) => {
                 const data = s.val();
@@ -243,12 +281,10 @@
                 
                 allItems = Object.keys(data).map(k => ({ id: k, ...data[k] }));
 
+                // Priority Sorting: Pending (Asc Date) > Completed (Asc Date) > Missed (Asc Date)
                 allItems.sort((a, b) => {
                     const statusA = (a.status || 'Pending');
                     const statusB = (b.status || 'Pending');
-
-                    // Map status to a numeric priority
-                    // 1: Pending (Top), 2: Completed (Middle), 3: Missed (Bottom)
                     const priority = { 'Pending': 1, 'Completed': 2, 'Missed': 3 };
                     
                     const pA = priority[statusA] || 1;
@@ -256,7 +292,6 @@
 
                     if (pA !== pB) return pA - pB;
 
-                    // If status is same, sort by date Ascending (Closest date first)
                     const dateA = new Date(a.date || '9999-12-31');
                     const dateB = new Date(b.date || '9999-12-31');
                     return dateA - dateB;
