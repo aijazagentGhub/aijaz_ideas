@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Fluxion Pro</title>
+    <title>Marathon Tracker - Aijaz</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -55,41 +55,30 @@
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
         
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
-        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
 
-        .status-Completed select { color: var(--color-completed) !important; font-weight: 800; }
-        .status-Pending select { color: var(--color-pending) !important; font-weight: 800; }
-        .status-Missed select { color: var(--color-missed) !important; font-weight: 800; }
+        /* --- CERTIFICATE CTA STYLES --- */
+        .cert-cell { display: flex; gap: 6px; align-items: center; }
+        .cta-btn { padding: 6px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; border: none; font-weight: 800; text-transform: uppercase; transition: 0.2s; }
+        .cta-up { background: #64748b; color: white; }
+        .cta-down { background: var(--primary-blue); color: white; }
+        .cta-btn:hover { transform: translateY(-1px); opacity: 0.9; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
-        .editable:empty:before { content: attr(data-placeholder); color: #cbd5e1; font-weight: 400; }
-
-        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
-        .btn-new { background: var(--primary-blue); color: white; }
-        .btn-csv { background: var(--header-teal); color: white; margin-left: 5px; }
+        .status-Completed select { color: var(--color-completed); font-weight: 800; }
+        .status-Pending select { color: var(--color-pending); font-weight: 800; }
+        .status-Missed select { color: var(--color-missed); font-weight: 800; }
 
         .pagination { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 30px; }
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        /* --- CERTIFICATE ACTIONS --- */
-        .cert-actions { display: flex; align-items: center; gap: 15px; }
-        .icon-btn { cursor: pointer; font-size: 1.2rem; transition: transform 0.2s; border: none; background: none; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
-        .icon-btn:hover { transform: scale(1.2); }
-        .download-btn { color: var(--primary-blue); text-decoration: none; }
-        .upload-label { color: #64748b; position: relative; }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-pane { padding: 15px; }
-        }
+        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -97,9 +86,7 @@
     <div class="sidebar" id="sidebar">
         <button class="toggle-btn" onclick="toggleSidebar()">↔</button>
         <div class="logo">FLUXION</div>
-        <nav>
-            <a href="#" class="nav-link"><span>🏃</span><span class="nav-text">Marathon Tracker</span></a>
-        </nav>
+        <nav><a href="#" class="nav-link"><span>🏃</span><span class="nav-text">Marathon Tracker</span></a></nav>
     </div>
 
     <div class="main-pane">
@@ -112,8 +99,8 @@
         <div class="header-row">
             <h1>Marathon Tracker</h1>
             <div>
-                <button class="btn btn-new" onclick="addNewRow()">+ Add Race</button>
-                <button class="btn btn-csv" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn-new btn" onclick="addNewRow()">+ Add Race</button>
+                <button class="btn-csv btn" onclick="exportToCSV()">Export CSV</button>
             </div>
         </div>
 
@@ -129,14 +116,14 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 80px;">KM</th>
+                        <th style="width: 60px;">KM</th>
                         <th style="width: 130px;">Date</th>
-                        <th style="width: 120px;">Status</th>
+                        <th style="width: 110px;">Status</th>
                         <th>Location</th>
                         <th style="width: 100px;">Paid (₹)</th>
                         <th style="width: 100px;">Time Taken</th>
-                        <th style="width: 120px;">Certificate</th>
-                        <th style="width: 50px; text-align: center;">X</th>
+                        <th style="width: 180px;">Certificate</th>
+                        <th style="width: 40px; text-align: center;">X</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -146,12 +133,10 @@
         <div class="pagination" id="paginationControls"></div>
 
         <div class="yearly-container">
-            <table class="yearly-table">
+            <table>
                 <thead>
-                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue); font-size: 1rem;">YEARLY PERFORMANCE BREAKDOWN</th></tr>
-                    <tr>
-                        <th>Year</th><th>Total Runs</th><th>Completed</th><th>Pending</th><th>Missed</th><th>Total Investment (₹)</th>
-                    </tr>
+                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue);">YEARLY PERFORMANCE BREAKDOWN</th></tr>
+                    <tr><th>Year</th><th>Total Runs</th><th>Completed</th><th>Pending</th><th>Missed</th><th>Total Investment (₹)</th></tr>
                 </thead>
                 <tbody id="yearlyBody"></tbody>
             </table>
@@ -182,47 +167,49 @@
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
-        async function handleFileUpload(id, file, labelElement) {
+        async function handleUpload(id, file) {
             if (!file) return;
+            const btn = document.getElementById(`up-btn-${id}`);
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ ...";
             
-            const originalIcon = labelElement.innerHTML;
-            labelElement.innerHTML = "⏳"; // Show loading
-            
-            const fileName = `${Date.now()}_${file.name}`;
-            const storageRef = storage.ref(`certificates/${id}/${fileName}`);
-            
+            const storageRef = storage.ref(`certificates/${id}/${Date.now()}_${file.name}`);
             try {
-                // 1. Upload to Storage
                 const snapshot = await storageRef.put(file);
-                // 2. Get the Download URL
-                const downloadURL = await snapshot.ref.getDownloadURL();
-                // 3. Update Realtime Database
-                await db.ref('marathons/' + id).update({ certUrl: downloadURL });
-                
-                alert("Certificate uploaded successfully!");
-            } catch (error) {
-                console.error("Upload Error:", error);
-                alert("Upload failed. Check if Firebase Storage is enabled and rules allow public read/write.");
+                const url = await snapshot.ref.getDownloadURL();
+                await db.ref('marathons/' + id).update({ certUrl: url });
+                alert("Upload Successful!");
+            } catch (e) { 
+                console.error(e);
+                alert("Upload Failed. Check Storage permissions."); 
             } finally {
-                labelElement.innerHTML = "⬆️"; // Reset icon
+                btn.innerText = originalText;
+            }
+        }
+
+        async function downloadCertificate(url, raceName) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = `${raceName.replace(/\s+/g, '_')}_Certificate.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (e) {
+                window.open(url, '_blank');
             }
         }
 
         function updateStats(items) {
-            let comp = 0, pend = 0, miss = 0, total = 0, yearlyData = {};
-            let upcoming = null;
-
+            let comp = 0, pend = 0, miss = 0, total = 0, yearlyData = {}, upcoming = null;
             items.forEach(item => {
-                const s = (item.status || 'Pending');
+                const s = item.status || 'Pending';
                 const amt = parseFloat(item.amount) || 0;
-                
-                if (s === 'Completed') comp++; 
-                else if (s === 'Missed') miss++; 
-                else {
-                    pend++;
-                    if (!upcoming && item.date) upcoming = item;
-                }
-                
+                if (s === 'Completed') comp++; else if (s === 'Missed') miss++; else { pend++; if (!upcoming && item.date) upcoming = item; }
                 total += amt;
                 if (item.date) {
                     const year = new Date(item.date).getFullYear();
@@ -235,14 +222,9 @@
                     }
                 }
             });
-
             const banner = document.getElementById('upcomingBanner');
-            if (upcoming) {
-                document.getElementById('bannerContent').innerText = `${upcoming.name} (${upcoming.date})`;
-                banner.style.display = 'inline-block';
-            } else {
-                banner.style.display = 'none';
-            }
+            if (upcoming) { banner.style.display = 'inline-block'; document.getElementById('bannerContent').innerText = `${upcoming.name} (${upcoming.date})`; }
+            else banner.style.display = 'none';
 
             document.getElementById('stat-completed').innerText = comp;
             document.getElementById('stat-pending').innerText = pend;
@@ -266,24 +248,22 @@
                 const row = document.createElement("tr");
                 const status = item.status || 'Pending';
                 row.innerHTML = `
-                    <td><div class="editable" contenteditable="true" data-placeholder="Race Name" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div></td>
-                    <td><div class="editable" contenteditable="true" data-placeholder="0" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
                     <td><input type="date" value="${item.date || ''}" onchange="updateDB('${item.id}', 'date', this.value)"></td>
                     <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)">
                         <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
                         <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
                         <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
                     </select></td>
-                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || ''}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
-                    <td><div class="editable" contenteditable="true" data-placeholder="00:00" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div></td>
                     <td>
-                        <div class="cert-actions">
-                            <label class="icon-btn upload-label" title="Upload Certificate">
-                                ⬆️
-                                <input type="file" style="display:none" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0], this.parentElement)">
-                            </label>
-                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="icon-btn download-btn" title="Download Certificate">⬇️</a>` : ''}
+                        <div class="cert-cell">
+                            <button class="cta-btn cta-up" id="up-btn-${item.id}" onclick="document.getElementById('input-${item.id}').click()">Upload</button>
+                            <input type="file" id="input-${item.id}" style="display:none" accept="application/pdf" onchange="handleUpload('${item.id}', this.files[0])">
+                            ${item.certUrl ? `<button class="cta-btn cta-down" onclick="downloadCertificate('${item.certUrl}', '${item.name}')">Download</button>` : ''}
                         </div>
                     </td>
                     <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
@@ -297,19 +277,16 @@
             db.ref('marathons').on('value', (s) => {
                 const data = s.val();
                 if (!data) { allItems = []; renderTable(); return; }
-                
                 allItems = Object.keys(data).map(k => ({ id: k, ...data[k] }));
-
+                
+                // 3-Tier Sorting logic
                 allItems.sort((a, b) => {
-                    const statusA = (a.status || 'Pending');
-                    const statusB = (b.status || 'Pending');
                     const priority = { 'Pending': 1, 'Completed': 2, 'Missed': 3 };
-                    const pA = priority[statusA] || 1;
-                    const pB = priority[statusB] || 1;
+                    const pA = priority[a.status || 'Pending'];
+                    const pB = priority[b.status || 'Pending'];
                     if (pA !== pB) return pA - pB;
                     return new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31');
                 });
-
                 updateStats(allItems);
                 renderTable();
             });
@@ -317,17 +294,15 @@
 
         function addNewRow() {
             const today = new Date().toISOString().split('T')[0];
-            db.ref('marathons').push({ name: "", distance: "", timeTaken: "", date: today, status: "Pending", location: "Bangalore", amount: 0, certUrl: "" });
+            db.ref('marathons').push({ name: "New Race", distance: "10", date: today, status: "Pending", location: "Bangalore", amount: 0, timeTaken: "00:00" });
         }
-
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete record?")) db.ref('marathons/' + id).remove(); }
+        function deleteFromDB(id) { if(confirm("Delete this race?")) db.ref('marathons/' + id).remove(); }
         
         function renderPagination() {
             const controls = document.getElementById("paginationControls");
             controls.innerHTML = "";
             const pageCount = Math.ceil(allItems.length / rowsPerPage);
-            if (pageCount <= 1) return;
             for (let i = 1; i <= pageCount; i++) {
                 const btn = document.createElement("button");
                 btn.innerText = i; btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
@@ -335,9 +310,9 @@
                 controls.appendChild(btn);
             }
         }
-
+        
         function exportToCSV() {
-            let csv = "Name,Distance,Date,Status,Location,Amount,Time\n";
+            let csv = "Name,KM,Date,Status,Location,Amount,Time\n";
             allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.timeTaken}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
