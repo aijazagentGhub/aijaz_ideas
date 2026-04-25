@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Fluxion</title>
+    <title>Marathon Tracker - Fluxion Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -56,21 +56,24 @@
 
         /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* Requirement 1: No horizontal bar for Yearly Table, extended size */
+        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; }
+        
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        .yearly-table { min-width: 100%; } /* Extends to full container width */
+
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
         tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
 
-        /* --- STATUS COLORS --- */
         .status-Completed select, .val-completed { color: var(--color-completed) !important; font-weight: 800; }
         .status-Pending select, .val-pending { color: var(--color-pending) !important; font-weight: 800; }
         .status-Missed select, .val-missed { color: var(--color-missed) !important; font-weight: 800; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
-        
-        /* Placeholder for empty editable divs */
         .editable:empty:before { content: attr(data-placeholder); color: #cbd5e1; font-weight: 400; }
 
         .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
@@ -81,9 +84,10 @@
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        .cert-cell { display: flex; flex-direction: column; gap: 4px; }
-        .view-link { font-size: 0.75rem; color: var(--primary-blue); text-decoration: none; font-weight: 700; }
-        .view-link:hover { text-decoration: underline; }
+        /* Requirement 2: Upload Styling */
+        .upload-wrapper { display: flex; flex-direction: column; gap: 5px; }
+        .file-input { font-size: 0.7rem; color: #64748b; width: 100%; }
+        .view-link { font-size: 0.75rem; color: var(--primary-blue); text-decoration: none; font-weight: 700; border: 1px solid var(--primary-blue); padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -128,14 +132,14 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 100px;">Dist. (KM)</th>
-                        <th style="width: 120px;">Time Taken</th>
+                        <th style="width: 80px;">KM</th>
+                        <th style="width: 100px;">Time</th>
                         <th style="width: 130px;">Date</th>
                         <th style="width: 120px;">Status</th>
                         <th>Location</th>
-                        <th style="width: 110px;">Paid (₹)</th>
-                        <th style="width: 180px;">Certificate URL</th>
-                        <th style="width: 60px; text-align: center;">Action</th>
+                        <th style="width: 100px;">Paid (₹)</th>
+                        <th style="width: 180px;">Certificate (PDF)</th>
+                        <th style="width: 50px; text-align: center;">X</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -144,12 +148,12 @@
 
         <div class="pagination" id="paginationControls"></div>
 
-        <div class="table-container" style="max-width: 850px;">
+        <div class="yearly-container">
             <table class="yearly-table">
                 <thead>
-                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue);">Yearly Summary Breakdown</th></tr>
+                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue); font-size: 1rem;">YEARLY PERFORMANCE BREAKDOWN</th></tr>
                     <tr>
-                        <th>Year</th><th>Total Runs</th><th>Comp.</th><th>Pend.</th><th>Miss.</th><th>Paid (₹)</th>
+                        <th>Year</th><th>Total Runs</th><th>Completed</th><th>Pending</th><th>Missed</th><th>Total Investment (₹)</th>
                     </tr>
                 </thead>
                 <tbody id="yearlyBody"></tbody>
@@ -159,6 +163,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -166,12 +171,13 @@
             authDomain: "aijazideas.firebaseapp.com",
             databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "aijazideas",
-            storageBucket: "aijazideas.firebasestorage.app",
+            storageBucket: "aijazideas.appspot.com", // Ensure this matches your console
             messagingSenderId: "822948950064",
             appId: "1:822948950064:web:031df081b41175ef3a7df5"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const storage = firebase.storage();
 
         let allItems = [];
         let currentPage = 1;
@@ -214,7 +220,7 @@
                         <td class="val-completed">${yd.comp}</td>
                         <td class="val-pending">${yd.pend}</td>
                         <td class="val-missed">${yd.miss}</td>
-                        <td>${yd.paid.toLocaleString('en-IN')}</td>
+                        <td>₹ ${yd.paid.toLocaleString('en-IN')}</td>
                     </tr>`;
             });
         }
@@ -229,6 +235,21 @@
                 document.getElementById('bannerContent').innerText = `${d}, ${future[0].name || 'TBD'}`;
                 banner.style.display = 'inline-block';
             } else { banner.style.display = 'none'; }
+        }
+
+        // Requirement 2: Upload logic
+        async function handleFileUpload(id, file) {
+            if (!file) return;
+            const storageRef = storage.ref(`certificates/${id}_${file.name}`);
+            try {
+                const snapshot = await storageRef.put(file);
+                const url = await snapshot.ref.getDownloadURL();
+                updateDB(id, 'certUrl', url);
+                alert("Upload Successful!");
+            } catch (e) {
+                console.error(e);
+                alert("Upload failed. Check Firebase Storage Rules.");
+            }
         }
 
         function renderTable() {
@@ -252,12 +273,12 @@
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
                     <td>
-                        <div class="cert-cell">
-                            <div class="editable" contenteditable="true" data-placeholder="Paste link" style="font-size: 0.75rem; color: #64748b;" onblur="updateDB('${item.id}', 'certUrl', this.innerText)">${item.certUrl || ''}</div>
-                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="view-link">View Certificate ↗</a>` : ''}
+                        <div class="upload-wrapper">
+                            <input type="file" class="file-input" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0])">
+                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="view-link">View PDF ↗</a>` : ''}
                         </div>
                     </td>
-                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer; font-size: 1.2rem;" onclick="deleteFromDB('${item.id}')">×</button></td>
+                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
                 `;
                 tableBody.appendChild(row);
             });
