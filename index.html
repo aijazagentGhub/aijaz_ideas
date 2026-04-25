@@ -31,18 +31,6 @@
         /* --- MAIN CONTENT --- */
         .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
         
-        .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; }
-        .upcoming-banner { 
-            background: var(--ice-blue); 
-            color: #1e293b; 
-            padding: 12px 25px; 
-            border-radius: 50px; 
-            display: inline-block;
-            border: 3px solid var(--alert-red);
-            text-align: center;
-            font-weight: 800;
-        }
-
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
         .header-row h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #334155; }
 
@@ -54,26 +42,13 @@
         /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        /* Yearly Table - Fully Extended */
-        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; }
+        /* Requirement: Extended Yearly Table, No Horizontal Bar */
+        .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
         
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        .yearly-table { min-width: 100%; }
+        .yearly-table { min-width: 100%; table-layout: fixed; }
 
-        th { 
-            background: var(--ice-blue); 
-            padding: 14px; 
-            border: 1px solid var(--border-color); 
-            font-weight: 800; 
-            text-align: left; 
-            font-size: 0.85rem; 
-            color: #1e293b; 
-            cursor: grab;
-            transition: background 0.2s;
-        }
-        th.dragging { opacity: 0.4; background: #cbd5e1; }
-        th.drag-over { border-left: 3px solid var(--primary-blue); }
-
+        th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
@@ -94,9 +69,9 @@
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        .upload-wrapper { display: flex; flex-direction: column; gap: 5px; }
-        .file-input { font-size: 0.7rem; color: #64748b; width: 100%; cursor: pointer; }
-        .view-link { font-size: 0.75rem; color: var(--primary-blue); text-decoration: none; font-weight: 700; border: 1px solid var(--primary-blue); padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content; }
+        .upload-wrapper { display: flex; flex-direction: column; gap: 4px; }
+        .file-input { font-size: 0.7rem; color: #64748b; }
+        .view-link { font-size: 0.7rem; color: var(--primary-blue); text-decoration: none; font-weight: 700; border: 1px solid var(--primary-blue); padding: 1px 4px; border-radius: 3px; display: inline-block; width: fit-content; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -115,12 +90,6 @@
     </div>
 
     <div class="main-pane">
-        <div class="banner-container">
-            <div class="upcoming-banner" id="upcomingBanner" style="display: none;">
-                Upcoming event! : <span id="bannerContent">...</span>
-            </div>
-        </div>
-
         <div class="header-row">
             <h1>Marathon Tracker</h1>
             <div>
@@ -137,9 +106,19 @@
         </div>
 
         <div class="table-container">
-            <table id="marathonTable">
+            <table>
                 <thead>
-                    <tr id="headerRow"></tr>
+                    <tr>
+                        <th>Marathon Name</th>
+                        <th style="width: 80px;">KM</th>
+                        <th style="width: 130px;">Date</th>
+                        <th style="width: 120px;">Status</th>
+                        <th>Location</th>
+                        <th style="width: 100px;">Paid (₹)</th>
+                        <th style="width: 100px;">Time Taken</th>
+                        <th style="width: 180px;">Certificate (PDF)</th>
+                        <th style="width: 50px; text-align: center;">X</th>
+                    </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
@@ -150,14 +129,9 @@
         <div class="yearly-container">
             <table class="yearly-table">
                 <thead>
-                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue); font-size: 1rem; cursor: default;">YEARLY PERFORMANCE BREAKDOWN</th></tr>
+                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue); font-size: 1rem;">YEARLY PERFORMANCE BREAKDOWN</th></tr>
                     <tr>
-                        <th style="cursor: default;">Year</th>
-                        <th style="cursor: default;">Total Runs</th>
-                        <th style="cursor: default;">Completed</th>
-                        <th style="cursor: default;">Pending</th>
-                        <th style="cursor: default;">Missed</th>
-                        <th style="cursor: default;">Total Investment (₹)</th>
+                        <th>Year</th><th>Total Runs</th><th>Completed</th><th>Pending</th><th>Missed</th><th>Total Investment (₹)</th>
                     </tr>
                 </thead>
                 <tbody id="yearlyBody"></tbody>
@@ -186,78 +160,8 @@
         let allItems = [];
         let currentPage = 1;
         const rowsPerPage = 5;
-        let columnOrder = ['name', 'distance', 'time', 'date', 'status', 'location', 'paid', 'cert'];
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
-
-        /* --- DRAG & DROP LOGIC --- */
-        let dragSrcEl = null;
-
-        function handleDragStart(e) {
-            dragSrcEl = this;
-            this.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', this.getAttribute('data-col'));
-        }
-
-        function handleDragOver(e) {
-            if (e.preventDefault) e.preventDefault();
-            this.classList.add('drag-over');
-            return false;
-        }
-
-        function handleDragLeave() { this.classList.remove('drag-over'); }
-
-        function handleDrop(e) {
-            if (e.preventDefault) e.preventDefault();
-            this.classList.remove('drag-over');
-
-            if (dragSrcEl !== this) {
-                const sourceCol = dragSrcEl.getAttribute('data-col');
-                const targetCol = this.getAttribute('data-col');
-                
-                const fromIdx = columnOrder.indexOf(sourceCol);
-                const toIdx = columnOrder.indexOf(targetCol);
-                
-                // Splice and Re-insert logic
-                columnOrder.splice(fromIdx, 1);
-                columnOrder.splice(toIdx, 0, sourceCol);
-                
-                renderHeaders();
-                renderTable();
-            }
-            return false;
-        }
-
-        function renderHeaders() {
-            const headerRow = document.getElementById('headerRow');
-            const labels = {
-                name: 'Marathon Name', distance: 'KM', time: 'Time',
-                date: 'Date', status: 'Status', location: 'Location',
-                paid: 'Paid (₹)', cert: 'Certificate (PDF)'
-            };
-            const widths = { distance: '80px', time: '100px', date: '130px', status: '120px', paid: '100px', cert: '180px' };
-
-            headerRow.innerHTML = '';
-            columnOrder.forEach(col => {
-                const th = document.createElement('th');
-                th.setAttribute('draggable', 'true');
-                th.setAttribute('data-col', col);
-                if (widths[col]) th.style.width = widths[col];
-                th.innerText = labels[col];
-                
-                th.addEventListener('dragstart', handleDragStart);
-                th.addEventListener('dragover', handleDragOver);
-                th.addEventListener('dragleave', handleDragLeave);
-                th.addEventListener('drop', handleDrop);
-                th.addEventListener('dragend', () => th.classList.remove('dragging'));
-                
-                headerRow.appendChild(th);
-            });
-            headerRow.innerHTML += `<th style="width: 50px; text-align: center; cursor: default;">X</th>`;
-        }
-
-        /* --- DATABASE & UI --- */
 
         async function handleFileUpload(id, file) {
             if (!file) return;
@@ -266,46 +170,7 @@
                 const snap = await ref.put(file);
                 const url = await snap.ref.getDownloadURL();
                 updateDB(id, 'certUrl', url);
-                alert("File uploaded!");
-            } catch (e) { alert("Upload failed. Ensure Storage is enabled."); }
-        }
-
-        function renderTable() {
-            const tableBody = document.getElementById("tableBody");
-            tableBody.innerHTML = "";
-            const paginated = allItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-            
-            paginated.forEach(item => {
-                const row = document.createElement("tr");
-                const status = item.status || 'Pending';
-                
-                columnOrder.forEach(col => {
-                    const td = document.createElement("td");
-                    if (col === 'status') td.className = `status-${status}`;
-
-                    switch(col) {
-                        case 'name': td.innerHTML = `<div class="editable" contenteditable="true" data-placeholder="Race Name" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div>`; break;
-                        case 'distance': td.innerHTML = `<div class="editable" contenteditable="true" data-placeholder="0" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div>`; break;
-                        case 'time': td.innerHTML = `<div class="editable" contenteditable="true" data-placeholder="00:00:00" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div>`; break;
-                        case 'date': td.innerHTML = `<input type="date" value="${item.date || ''}" onchange="updateDB('${item.id}', 'date', this.value)">`; break;
-                        case 'status': td.innerHTML = `<select onchange="updateDB('${item.id}', 'status', this.value)">
-                                <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
-                                <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
-                            </select>`; break;
-                        case 'location': td.innerHTML = `<div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div>`; break;
-                        case 'paid': td.innerHTML = `<input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)">`; break;
-                        case 'cert': td.innerHTML = `<div class="upload-wrapper">
-                            <input type="file" class="file-input" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0])">
-                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="view-link">View PDF ↗</a>` : ''}
-                        </div>`; break;
-                    }
-                    row.appendChild(td);
-                });
-                row.innerHTML += `<td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>`;
-                tableBody.appendChild(row);
-            });
-            renderPagination();
+            } catch (e) { alert("Upload error. Check Firebase Storage."); }
         }
 
         function updateStats(items) {
@@ -335,8 +200,41 @@
             yBody.innerHTML = "";
             Object.keys(yearlyData).sort((a,b) => b-a).forEach(year => {
                 const yd = yearlyData[year];
-                yBody.innerHTML += `<tr><td><strong>${year}</strong></td><td>${yd.count}</td><td style="color:var(--color-completed)">${yd.comp}</td><td style="color:var(--color-pending)">${yd.pend}</td><td style="color:var(--color-missed)">${yd.miss}</td><td>₹ ${yd.paid.toLocaleString('en-IN')}</td></tr>`;
+                yBody.innerHTML += `<tr><td><strong>${year}</strong></td><td>${yd.count}</td><td>${yd.comp}</td><td>${yd.pend}</td><td>${yd.miss}</td><td>₹ ${yd.paid.toLocaleString('en-IN')}</td></tr>`;
             });
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = "";
+            const paginated = allItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+            
+            paginated.forEach(item => {
+                const row = document.createElement("tr");
+                const status = item.status || 'Pending';
+                row.innerHTML = `
+                    <td><div class="editable" contenteditable="true" data-placeholder="Race Name" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" data-placeholder="0" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                    <td><input type="date" value="${item.date || ''}" onchange="updateDB('${item.id}', 'date', this.value)"></td>
+                    <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)">
+                        <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
+                    </select></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
+                    <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
+                    <td><div class="editable" contenteditable="true" data-placeholder="00:00" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div></td>
+                    <td>
+                        <div class="upload-wrapper">
+                            <input type="file" class="file-input" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0])">
+                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="view-link">View PDF ↗</a>` : ''}
+                        </div>
+                    </td>
+                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+            renderPagination();
         }
 
         function loadData() {
@@ -371,14 +269,13 @@
         }
 
         function exportToCSV() {
-            let csv = "Name,Distance,Time,Date,Status,Location,Amount\n";
-            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.timeTaken}","${i.date}","${i.status}","${i.location}","${i.amount}"\n`);
+            let csv = "Name,Distance,Date,Status,Location,Amount,Time\n";
+            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.timeTaken}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'Marathon_Data.csv'; a.click();
+            const a = document.createElement('a'); a.href = url; a.download = 'Marathons.csv'; a.click();
         }
 
-        renderHeaders();
         loadData();
     </script>
 </body>
