@@ -20,7 +20,6 @@
 
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f1f5f9; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
         .sidebar { width: 240px; background: white; border-right: 1px solid var(--border-color); padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s ease; position: relative; }
         .sidebar.collapsed { width: 60px; padding: 20px 10px; }
         .sidebar.collapsed .logo, .sidebar.collapsed .nav-text { display: none; }
@@ -28,24 +27,8 @@
         .toggle-btn { position: absolute; top: 20px; right: -15px; background: var(--primary-blue); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 10; font-weight: bold; }
         .nav-link { text-decoration: none; color: var(--primary-blue); font-weight: 600; padding: 12px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; gap: 10px; }
 
-        /* --- MAIN CONTENT --- */
         .main-pane { flex-grow: 1; padding: 20px; overflow-y: auto; background: linear-gradient(rgba(241, 245, 249, 0.92), rgba(241, 245, 249, 0.92)), url('https://raw.githubusercontent.com/aijazagentGhub/aijaz_ideas/main/background.png'); background-size: cover; background-attachment: fixed; }
         
-        /* --- BANNER --- */
-        @keyframes blinker { 50% { opacity: 0.3; } }
-        .banner-container { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; min-height: 50px; }
-        .upcoming-banner { 
-            background: var(--ice-blue); 
-            color: #1e293b; 
-            padding: 12px 25px; 
-            border-radius: 50px; 
-            display: inline-block;
-            border: 3px solid var(--alert-red);
-            text-align: center;
-            font-weight: 800;
-            animation: blinker 0.6s linear 5;
-        }
-
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
         .header-row h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #334155; }
 
@@ -55,12 +38,11 @@
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
-        tbody tr:hover { background-color: var(--ice-blue) !important; transition: 0.2s; }
-
+        
         .status-Completed select { color: var(--color-completed) !important; font-weight: 800; }
         .status-Pending select { color: var(--color-pending) !important; font-weight: 800; }
         .status-Missed select { color: var(--color-missed) !important; font-weight: 800; }
@@ -79,24 +61,17 @@
     </div>
 
     <div class="main-pane">
-        <div class="banner-container">
-            <div class="upcoming-banner" id="upcomingBanner" style="display: none;">
-                Upcoming event! : <span id="bannerContent">...</span>
-            </div>
-        </div>
-
         <div class="header-row">
             <h1>Marathon Tracker</h1>
             <div>
-                <button class="btn" style="background: var(--primary-blue); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer;" onclick="addNewRow()">+ Add Race</button>
-                <button class="btn" style="background: var(--header-teal); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer; margin-left:5px;" onclick="exportToCSV()">Export CSV</button>
+                <button style="background: var(--primary-blue); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer;" onclick="addNewRow()">+ Add Race</button>
+                <button style="background: var(--header-teal); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer; margin-left:5px;" onclick="exportToCSV()">Export CSV</button>
             </div>
         </div>
 
         <div class="summary-bar">
             <div class="stat-card"><h3>Completed</h3><p id="stat-completed" style="color:var(--color-completed)">0</p></div>
             <div class="stat-card"><h3>Pending</h3><p id="stat-pending" style="color:var(--color-pending)">0</p></div>
-            <div class="stat-card"><h3>Missed</h3><p id="stat-missed" style="color:var(--color-missed)">0</p></div>
             <div class="stat-card"><h3>Total Paid ₹</h3><p id="stat-total-paid">0</p></div>
         </div>
 
@@ -105,12 +80,13 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 70px;">KM</th>
-                        <th style="width: 130px;">Date</th>
-                        <th style="width: 120px;">Status</th>
+                        <th style="width: 60px;">KM</th>
+                        <th style="width: 120px;">Date</th>
+                        <th style="width: 110px;">Status</th>
                         <th>Location</th>
-                        <th style="width: 110px;">Paid (₹)</th>
-                        <th style="width: 120px;">Time Taken</th>
+                        <th style="width: 100px;">Paid (₹)</th>
+                        <th style="width: 100px;">Time Taken</th>
+                        <th style="width: 150px;">Cert URL</th>
                         <th style="width: 40px; text-align: center;">X</th>
                     </tr>
                 </thead>
@@ -150,11 +126,11 @@
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
         function updateStats(items) {
-            let comp = 0, pend = 0, miss = 0, total = 0, yearlyData = {}, upcoming = null;
+            let comp = 0, pend = 0, miss = 0, total = 0, yearlyData = {};
             items.forEach(item => {
                 const s = item.status || 'Pending';
                 const amt = parseFloat(item.amount) || 0;
-                if (s === 'Completed') comp++; else if (s === 'Missed') miss++; else { pend++; if (!upcoming && item.date) upcoming = item; }
+                if (s === 'Completed') comp++; else if (s === 'Missed') miss++; else pend++;
                 total += amt;
                 if (item.date) {
                     const year = new Date(item.date).getFullYear();
@@ -167,13 +143,8 @@
                     }
                 }
             });
-            const banner = document.getElementById('upcomingBanner');
-            if (upcoming) { banner.style.display = 'inline-block'; document.getElementById('bannerContent').innerText = `${upcoming.name} (${upcoming.date})`; }
-            else banner.style.display = 'none';
-
             document.getElementById('stat-completed').innerText = comp;
             document.getElementById('stat-pending').innerText = pend;
-            document.getElementById('stat-missed').innerText = miss;
             document.getElementById('stat-total-paid').innerText = total.toLocaleString('en-IN');
             
             const yBody = document.getElementById('yearlyBody');
@@ -202,6 +173,7 @@
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || ''}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || '00:00'}</div></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'certUrl', this.innerText)" style="color:var(--primary-blue); text-decoration:underline;">${item.certUrl || ''}</div></td>
                     <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
                 `;
                 tableBody.appendChild(row);
@@ -211,13 +183,10 @@
         function loadData() {
             db.ref('marathons').on('value', (s) => {
                 const data = s.val();
-                if (!data) { allItems = []; renderTable(); return; }
-                allItems = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+                allItems = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
                 allItems.sort((a, b) => {
                     const priority = { 'Pending': 1, 'Completed': 2, 'Missed': 3 };
-                    const pA = priority[a.status || 'Pending']; const pB = priority[b.status || 'Pending'];
-                    if (pA !== pB) return pA - pB;
-                    return new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31');
+                    return (priority[a.status || 'Pending'] - priority[b.status || 'Pending']) || (new Date(a.date || '9999') - new Date(b.date || '9999'));
                 });
                 updateStats(allItems);
                 renderTable();
@@ -225,14 +194,13 @@
         }
 
         function addNewRow() {
-            const today = new Date().toISOString().split('T')[0];
-            db.ref('marathons').push({ name: "New Race", distance: "10", date: today, status: "Pending", location: "Bangalore", amount: 0, timeTaken: "00:00" });
+            db.ref('marathons').push({ name: "New Race", distance: "10", date: new Date().toISOString().split('T')[0], status: "Pending", location: "Bangalore", amount: 0, timeTaken: "00:00", certUrl: "" });
         }
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
         function deleteFromDB(id) { if(confirm("Delete this entry?")) db.ref('marathons/' + id).remove(); }
         function exportToCSV() {
-            let csv = "Name,KM,Date,Status,Location,Amount,Time\n";
-            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.timeTaken}"\n`);
+            let csv = "Name,KM,Date,Status,Location,Amount,Time,CertURL\n";
+            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.timeTaken}","${i.certUrl}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = 'Marathons.csv'; a.click();
