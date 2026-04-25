@@ -39,10 +39,8 @@
         .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
-        /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        /* Requirement: Extended Yearly Table, No Horizontal Bar */
         .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
         
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
@@ -159,7 +157,7 @@
 
         let allItems = [];
         let currentPage = 1;
-        const rowsPerPage = 5;
+        const rowsPerPage = 10;
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
@@ -170,7 +168,7 @@
                 const snap = await ref.put(file);
                 const url = await snap.ref.getDownloadURL();
                 updateDB(id, 'certUrl', url);
-            } catch (e) { alert("Upload error. Check Firebase Storage."); }
+            } catch (e) { alert("Upload error."); }
         }
 
         function updateStats(items) {
@@ -237,11 +235,33 @@
             renderPagination();
         }
 
+        /* --- THREE-TIER SORTING LOGIC --- */
         function loadData() {
             db.ref('marathons').on('value', (s) => {
                 const data = s.val();
-                allItems = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
-                allItems.sort((a, b) => new Date(a.date) - new Date(b.date));
+                if (!data) { allItems = []; renderTable(); return; }
+                
+                allItems = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+
+                allItems.sort((a, b) => {
+                    const statusA = (a.status || 'Pending');
+                    const statusB = (b.status || 'Pending');
+
+                    // Map status to a numeric priority
+                    // 1: Pending (Top), 2: Completed (Middle), 3: Missed (Bottom)
+                    const priority = { 'Pending': 1, 'Completed': 2, 'Missed': 3 };
+                    
+                    const pA = priority[statusA] || 1;
+                    const pB = priority[statusB] || 1;
+
+                    if (pA !== pB) return pA - pB;
+
+                    // If status is same, sort by date Ascending (Closest date first)
+                    const dateA = new Date(a.date || '9999-12-31');
+                    const dateB = new Date(b.date || '9999-12-31');
+                    return dateA - dateB;
+                });
+
                 updateStats(allItems);
                 renderTable();
             });
