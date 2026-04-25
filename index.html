@@ -81,10 +81,10 @@
 
         /* --- CERTIFICATE ACTIONS --- */
         .cert-actions { display: flex; align-items: center; gap: 15px; }
-        .icon-btn { cursor: pointer; font-size: 1.2rem; transition: transform 0.2s; border: none; background: none; padding: 0; }
+        .icon-btn { cursor: pointer; font-size: 1.2rem; transition: transform 0.2s; border: none; background: none; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
         .icon-btn:hover { transform: scale(1.2); }
-        .download-btn { color: var(--primary-blue); text-decoration: none; display: flex; align-items: center; }
-        .upload-label { color: #64748b; display: flex; align-items: center; }
+        .download-btn { color: var(--primary-blue); text-decoration: none; }
+        .upload-label { color: #64748b; position: relative; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -182,18 +182,29 @@
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
-        async function handleFileUpload(id, file) {
+        async function handleFileUpload(id, file, labelElement) {
             if (!file) return;
-            const ref = storage.ref(`certificates/${id}_${file.name}`);
+            
+            const originalIcon = labelElement.innerHTML;
+            labelElement.innerHTML = "⏳"; // Show loading
+            
+            const fileName = `${Date.now()}_${file.name}`;
+            const storageRef = storage.ref(`certificates/${id}/${fileName}`);
+            
             try {
-                const snap = await ref.put(file);
-                const url = await snap.ref.getDownloadURL();
-                // FIX: Update the specific record in DB so it persists on refresh
-                await db.ref('marathons/' + id).update({ certUrl: url });
-                alert("Upload Successful!");
-            } catch (e) { 
-                console.error(e);
-                alert("Upload failed. Ensure Storage rules allow uploads."); 
+                // 1. Upload to Storage
+                const snapshot = await storageRef.put(file);
+                // 2. Get the Download URL
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                // 3. Update Realtime Database
+                await db.ref('marathons/' + id).update({ certUrl: downloadURL });
+                
+                alert("Certificate uploaded successfully!");
+            } catch (error) {
+                console.error("Upload Error:", error);
+                alert("Upload failed. Check if Firebase Storage is enabled and rules allow public read/write.");
+            } finally {
+                labelElement.innerHTML = "⬆️"; // Reset icon
             }
         }
 
@@ -270,7 +281,7 @@
                         <div class="cert-actions">
                             <label class="icon-btn upload-label" title="Upload Certificate">
                                 ⬆️
-                                <input type="file" style="display:none" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0])">
+                                <input type="file" style="display:none" accept="application/pdf" onchange="handleFileUpload('${item.id}', this.files[0], this.parentElement)">
                             </label>
                             ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="icon-btn download-btn" title="Download Certificate">⬇️</a>` : ''}
                         </div>
