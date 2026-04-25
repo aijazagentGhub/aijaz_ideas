@@ -54,9 +54,8 @@
         .stat-card h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
         .stat-card p { margin: 5px 0 0; font-size: 1.6rem; font-weight: 800; }
 
-        /* --- TABLE STYLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
@@ -67,13 +66,6 @@
         .status-Missed select { color: var(--color-missed) !important; font-weight: 800; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
-        
-        /* --- CERTIFICATE UI --- */
-        .cert-cell { display: flex; align-items: center; gap: 4px; }
-        .file-name-display { flex: 1; font-size: 9px; color: #64748b; border: 1px solid #ddd; padding: 2px 4px; border-radius: 3px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: #fff; }
-        .cert-btn { padding: 4px 6px; font-size: 9px; font-weight: 800; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
-        .btn-up { background: #64748b; color: white; }
-        .btn-down { background: var(--primary-blue); color: white; }
 
         .yearly-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 50px; width: 100%; overflow: hidden; }
     </style>
@@ -96,8 +88,8 @@
         <div class="header-row">
             <h1>Marathon Tracker</h1>
             <div>
-                <button class="btn btn-new" style="background: var(--primary-blue); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer;" onclick="addNewRow()">+ Add Race</button>
-                <button class="btn btn-csv" style="background: var(--header-teal); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer; margin-left:5px;" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn" style="background: var(--primary-blue); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer;" onclick="addNewRow()">+ Add Race</button>
+                <button class="btn" style="background: var(--header-teal); color:white; padding: 8px 16px; border-radius: 8px; font-weight:700; border:none; cursor:pointer; margin-left:5px;" onclick="exportToCSV()">Export CSV</button>
             </div>
         </div>
 
@@ -113,13 +105,12 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 60px;">KM</th>
-                        <th style="width: 120px;">Date</th>
-                        <th style="width: 110px;">Status</th>
+                        <th style="width: 70px;">KM</th>
+                        <th style="width: 130px;">Date</th>
+                        <th style="width: 120px;">Status</th>
                         <th>Location</th>
-                        <th style="width: 100px;">Paid (₹)</th>
-                        <th style="width: 180px;">Certificate</th>
-                        <th style="width: 100px;">Time Taken</th>
+                        <th style="width: 110px;">Paid (₹)</th>
+                        <th style="width: 120px;">Time Taken</th>
                         <th style="width: 40px; text-align: center;">X</th>
                     </tr>
                 </thead>
@@ -140,7 +131,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -154,38 +144,10 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const storage = firebase.storage();
 
         let allItems = [];
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
-
-        async function handleUpload(id, file) {
-            if (!file) return;
-            const btn = document.getElementById(`up-${id}`);
-            btn.innerText = "...";
-            const ref = storage.ref(`certs/${id}/${file.name}`);
-            try {
-                const snap = await ref.put(file);
-                const url = await snap.ref.getDownloadURL();
-                await db.ref('marathons/' + id).update({ certUrl: url, certFileName: file.name });
-            } catch (e) { alert("Upload error"); }
-            btn.innerText = "UPLOAD";
-        }
-
-        async function triggerDownload(url, filename) {
-            try {
-                const res = await fetch(url);
-                const blob = await res.blob();
-                const bUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = bUrl;
-                a.download = filename || "Certificate.pdf";
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            } catch (e) { window.open(url, '_blank'); }
-        }
 
         function updateStats(items) {
             let comp = 0, pend = 0, miss = 0, total = 0, yearlyData = {}, upcoming = null;
@@ -237,16 +199,8 @@
                         <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
                         <option value="Missed" ${status === 'Missed' ? 'selected' : ''}>Missed</option>
                     </select></td>
-                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
+                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || ''}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
-                    <td>
-                        <div class="cert-cell">
-                            <div class="file-name-display" title="${item.certFileName || ''}">${item.certFileName || 'No file'}</div>
-                            <button class="cert-btn btn-up" id="up-${item.id}" onclick="document.getElementById('file-${item.id}').click()">UP</button>
-                            <input type="file" id="file-${item.id}" style="display:none" accept="application/pdf" onchange="handleUpload('${item.id}', this.files[0])">
-                            ${item.certUrl ? `<button class="cert-btn btn-down" onclick="triggerDownload('${item.certUrl}', '${item.certFileName}')">DOWN</button>` : ''}
-                        </div>
-                    </td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || '00:00'}</div></td>
                     <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
                 `;
@@ -275,7 +229,7 @@
             db.ref('marathons').push({ name: "New Race", distance: "10", date: today, status: "Pending", location: "Bangalore", amount: 0, timeTaken: "00:00" });
         }
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
-        function deleteFromDB(id) { if(confirm("Delete?")) db.ref('marathons/' + id).remove(); }
+        function deleteFromDB(id) { if(confirm("Delete this entry?")) db.ref('marathons/' + id).remove(); }
         function exportToCSV() {
             let csv = "Name,KM,Date,Status,Location,Amount,Time\n";
             allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.timeTaken}"\n`);
