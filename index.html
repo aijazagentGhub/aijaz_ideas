@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marathon Tracker - Unified Colors</title>
+    <title>Marathon Tracker - Fluxion</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -57,7 +56,7 @@
 
         /* --- TABLES --- */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: var(--ice-blue); padding: 14px; border: 1px solid var(--border-color); font-weight: 800; text-align: left; font-size: 0.85rem; color: #1e293b; }
         td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 600; }
         
@@ -70,6 +69,10 @@
         .status-Missed select, .val-missed { color: var(--color-missed) !important; font-weight: 800; }
 
         input, select, .editable { width: 100%; border: none; background: transparent; outline: none; font-family: inherit; font-size: inherit; font-weight: inherit; color: inherit; }
+        
+        /* Placeholder for empty editable divs */
+        .editable:empty:before { content: attr(data-placeholder); color: #cbd5e1; font-weight: 400; }
+
         .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
         .btn-new { background: var(--primary-blue); color: white; }
         .btn-csv { background: var(--header-teal); color: white; margin-left: 5px; }
@@ -78,7 +81,9 @@
         .page-btn { padding: 5px 12px; border: 1px solid var(--border-color); background: white; cursor: pointer; border-radius: 4px; font-weight: 600; }
         .page-btn.active { background: var(--primary-blue); color: white; }
 
-        .yearly-table td { text-align: center; }
+        .cert-cell { display: flex; flex-direction: column; gap: 4px; }
+        .view-link { font-size: 0.75rem; color: var(--primary-blue); text-decoration: none; font-weight: 700; }
+        .view-link:hover { text-decoration: underline; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -123,12 +128,14 @@
                 <thead>
                     <tr>
                         <th>Marathon Name</th>
-                        <th style="width: 120px;">Distance (KM)</th>
-                        <th style="width: 140px;">Date</th>
-                        <th style="width: 130px;">Status</th>
+                        <th style="width: 100px;">Dist. (KM)</th>
+                        <th style="width: 120px;">Time Taken</th>
+                        <th style="width: 130px;">Date</th>
+                        <th style="width: 120px;">Status</th>
                         <th>Location</th>
-                        <th style="width: 120px;">Paid (₹)</th>
-                        <th style="width: 80px; text-align: center;">Action</th>
+                        <th style="width: 110px;">Paid (₹)</th>
+                        <th style="width: 180px;">Certificate URL</th>
+                        <th style="width: 60px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -140,7 +147,7 @@
         <div class="table-container" style="max-width: 850px;">
             <table class="yearly-table">
                 <thead>
-                    <tr><th colspan="6" style="text-align: center;">Yearly Summary Breakdown</th></tr>
+                    <tr><th colspan="6" style="text-align: center; background-color: var(--ice-blue);">Yearly Summary Breakdown</th></tr>
                     <tr>
                         <th>Year</th><th>Total Runs</th><th>Comp.</th><th>Pend.</th><th>Miss.</th><th>Paid (₹)</th>
                     </tr>
@@ -155,20 +162,20 @@
 
     <script>
         const firebaseConfig = {
-apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
-  authDomain: "aijazideas.firebaseapp.com",
-  databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "aijazideas",
-  storageBucket: "aijazideas.firebasestorage.app",
-  messagingSenderId: "822948950064",
-  appId: "1:822948950064:web:031df081b41175ef3a7df5"
+            apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
+            authDomain: "aijazideas.firebaseapp.com",
+            databaseURL: "https://aijazideas-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "aijazideas",
+            storageBucket: "aijazideas.firebasestorage.app",
+            messagingSenderId: "822948950064",
+            appId: "1:822948950064:web:031df081b41175ef3a7df5"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         let allItems = [];
         let currentPage = 1;
-        const rowsPerPage = 4;
+        const rowsPerPage = 5;
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
@@ -228,12 +235,14 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
             const tableBody = document.getElementById("tableBody");
             tableBody.innerHTML = "";
             const paginated = allItems.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+            
             paginated.forEach(item => {
                 const row = document.createElement("tr");
                 const status = item.status || 'Pending';
                 row.innerHTML = `
-                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div></td>
-                    <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" data-placeholder="Enter name" onblur="updateDB('${item.id}', 'name', this.innerText)">${item.name || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" data-placeholder="0" onblur="updateDB('${item.id}', 'distance', this.innerText)">${item.distance || ''}</div></td>
+                    <td><div class="editable" contenteditable="true" data-placeholder="00:00:00" onblur="updateDB('${item.id}', 'timeTaken', this.innerText)">${item.timeTaken || ''}</div></td>
                     <td><input type="date" value="${item.date || ''}" onchange="updateDB('${item.id}', 'date', this.value)"></td>
                     <td class="status-${status}"><select onchange="updateDB('${item.id}', 'status', this.value)">
                         <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
@@ -242,7 +251,13 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
                     </select></td>
                     <td><div class="editable" contenteditable="true" onblur="updateDB('${item.id}', 'location', this.innerText)">${item.location || 'Bangalore'}</div></td>
                     <td><input type="number" value="${item.amount || ''}" onblur="updateDB('${item.id}', 'amount', this.value)"></td>
-                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteFromDB('${item.id}')">×</button></td>
+                    <td>
+                        <div class="cert-cell">
+                            <div class="editable" contenteditable="true" data-placeholder="Paste link" style="font-size: 0.75rem; color: #64748b;" onblur="updateDB('${item.id}', 'certUrl', this.innerText)">${item.certUrl || ''}</div>
+                            ${item.certUrl ? `<a href="${item.certUrl}" target="_blank" class="view-link">View Certificate ↗</a>` : ''}
+                        </div>
+                    </td>
+                    <td style="text-align:center;"><button style="color:red; background:none; border:none; cursor:pointer; font-size: 1.2rem;" onclick="deleteFromDB('${item.id}')">×</button></td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -282,15 +297,24 @@ apiKey: "AIzaSyAnnzBIK2Y0P1Gn8_4I6ZOu2z0P1LEeDk0",
 
         function addNewRow() {
             const today = new Date().toISOString().split('T')[0];
-            db.ref('marathons').push({ name: "", distance: "", date: today, status: "Pending", location: "Bangalore", amount: 0 });
+            db.ref('marathons').push({ 
+                name: "", 
+                distance: "", 
+                timeTaken: "", 
+                date: today, 
+                status: "Pending", 
+                location: "Bangalore", 
+                amount: 0,
+                certUrl: "" 
+            });
         }
 
         function updateDB(id, field, value) { db.ref('marathons/' + id).update({ [field]: value }); }
         function deleteFromDB(id) { if(confirm("Delete record?")) db.ref('marathons/' + id).remove(); }
         
         function exportToCSV() {
-            let csv = "Name,Distance,Date,Status,Location,Amount\n";
-            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.date}","${i.status}","${i.location}","${i.amount}"\n`);
+            let csv = "Name,Distance,TimeTaken,Date,Status,Location,Amount,CertURL\n";
+            allItems.forEach(i => csv += `"${i.name}","${i.distance}","${i.timeTaken}","${i.date}","${i.status}","${i.location}","${i.amount}","${i.certUrl}"\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = 'Marathons_Export.csv'; a.click();
